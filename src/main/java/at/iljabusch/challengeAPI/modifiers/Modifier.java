@@ -12,9 +12,5 @@ public abstract class Modifier {
     this.challenge = challenge;
   }
 
-  public abstract String getName();
-
-  public abstract String getAuthor();
-
   public abstract void onPlayerJoin(Player player);
 }

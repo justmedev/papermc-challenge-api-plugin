@@ -47,6 +47,7 @@ public class ChallengeCmd implements CommandExecutor, TabExecutor {
       if (args[0].equalsIgnoreCase("create")) {
         getLogger().info("Creating a new shared health challenge");
 
+
         var challenge = new Challenge(players);
         challenge.setModifiers(Set.of(new SharedHealthModifier(challenge)));
         GlobalState.getInstance().registerNewChallenge(challenge, challenge.getPlayers());

@@ -2,7 +2,10 @@ package at.iljabusch.challengeAPI;
 
 import at.iljabusch.challengeAPI.commands.ChallengeCmd;
 import at.iljabusch.challengeAPI.commands.ChallengeMenuCmd;
+import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
+import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -15,6 +18,15 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
   public void onEnable() {
     getLogger().info("ChallengeAPI Plugin is starting ...");
     Bukkit.getPluginManager().registerEvents(this, this);
+
+    GlobalState.getInstance().registerModifier(
+        new RegisteredModifier(
+            "Shared-Health",
+            "Ilja Busch",
+            Material.RED_TULIP,
+            SharedHealthModifier.class
+        )
+    );
 
     getCommand("challenge").setExecutor(new ChallengeCmd());
     getCommand("challenge-menu").setExecutor(new ChallengeMenuCmd());

@@ -15,16 +15,6 @@ public class SharedHealthModifier extends Modifier {
   }
 
   @Override
-  public String getName() {
-    return "Shared Health";
-  }
-
-  @Override
-  public String getAuthor() {
-    return "Ilja Busch";
-  }
-
-  @Override
   public void onPlayerJoin(Player player) {
     var otherPlayer = challenge.getPlayers().getFirst();
     player.setFoodLevel(otherPlayer.getFoodLevel());

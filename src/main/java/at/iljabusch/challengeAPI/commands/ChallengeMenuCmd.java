@@ -1,6 +1,8 @@
 package at.iljabusch.challengeAPI.commands;
 
 import at.iljabusch.challengeAPI.menus.ChallengeCreationMenu;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Color;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,7 +19,7 @@ public class ChallengeMenuCmd implements CommandExecutor {
                            @NotNull String label,
                            @NotNull String @NotNull [] args) {
     if (!(sender instanceof Player player)) {
-      sender.sendMessage("&cOnly players can use this command.");
+      sender.sendMessage(Component.text("§cOnly players can use this command."));
       return true;
     }
 
