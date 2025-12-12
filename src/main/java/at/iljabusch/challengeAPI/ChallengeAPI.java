@@ -1,8 +1,6 @@
 package at.iljabusch.challengeAPI;
 
 import at.iljabusch.challengeAPI.commands.ChallengeCmd;
-import java.util.HashMap;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -10,12 +8,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ChallengeAPI extends JavaPlugin implements Listener {
-
-  /*
-  Store uuid of player and nullable player object with challenge state
-   */
-  public HashMap<UUID, PlayerInChallenge> playersInChallenge = new HashMap<>();
-
+  private PluginState state = PluginState.getInstance();
 
   @Override
   public void onEnable() {
@@ -28,7 +21,14 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
   @EventHandler
   public void onPlayerJoin(PlayerJoinEvent event) {
     getLogger().info("%s joined!".formatted(event.getPlayer().getUniqueId()));
-    // event.getPlayer().sendMessage(Component.text("Hello, " + event.getPlayer().getName() + "!"));
+    var player = state.getPlayersInChallenges().get(event.getPlayer().getUniqueId());
+    if (player == null) {
+      return;
+    }
+
+    player.setPlayer(event.getPlayer());
+    player.getChallenge().onJoin(player.getPlayer());
+    player.getPlayer().sendMessage("Rejoining challenge!");
   }
 
   @Override

@@ -1,0 +1,35 @@
+@startuml
+hide empty members
+hide empty methods
+
+interface Challenge {
+  getName(): String
+  onCreate()
+  onPlayerJoin(Player player)
+  onPlayerLeave(Player player)
+}
+
+class SharedHealthChallenge
+class HalalChallenge
+
+class Player
+
+class ChallengedPlayer {
+  challenge: Challenge
+}
+
+class PluginMain {
+
+}
+
+class PluginState<Singleton> {
+  activeChallenges: List<Challenge>
+  playersInChallenges: List<Player>
+
+}
+
+SharedHealthChallenge --up|> Challenge
+HalalChallenge --up|> Challenge
+ChallengedPlayer --up|> Player
+ChallengedPlayer --> Challenge
+@enduml

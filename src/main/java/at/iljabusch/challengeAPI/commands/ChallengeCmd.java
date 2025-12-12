@@ -2,6 +2,7 @@ package at.iljabusch.challengeAPI.commands;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.Challenge;
+import at.iljabusch.challengeAPI.PluginState;
 import at.iljabusch.challengeAPI.challenges.sharedhealth.SharedHealthChallenge;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ChallengeCmd implements CommandExecutor {
-  private ArrayList<Challenge> challenges = new ArrayList<>();
+  private final ArrayList<Challenge> challenges = new ArrayList<>();
 
   @Override
   public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
@@ -32,7 +33,7 @@ public class ChallengeCmd implements CommandExecutor {
         getLogger().info("Creating a new shared health challenge");
         var challenge = new SharedHealthChallenge();
         challenge.onCreate(List.of(player, otherPlayer));
-        challenges.add(challenge);
+        PluginState.getInstance().registerNewChallenge(challenge, List.of(player, otherPlayer));
       }
       return true;
     }

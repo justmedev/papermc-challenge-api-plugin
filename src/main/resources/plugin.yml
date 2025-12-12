@@ -6,6 +6,6 @@ prefix: ChallengeAPI
 authors: [ Ilja Busch ]
 depend: ['Multiverse-Core']
 commands:
-  basic:
+  challenge:
     description: Do something with challenges
     usage: /challenge [join]
