@@ -16,8 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ChallengeCmd implements CommandExecutor, TabExecutor {
-  private final ArrayList<Challenge> challenges = new ArrayList<>();
-
   @Override
   public boolean onCommand(@NotNull CommandSender sender,
                            @NotNull Command command,

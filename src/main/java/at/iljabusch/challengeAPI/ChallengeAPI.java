@@ -1,6 +1,7 @@
 package at.iljabusch.challengeAPI;
 
 import at.iljabusch.challengeAPI.commands.ChallengeCmd;
+import at.iljabusch.challengeAPI.commands.ChallengeMenuCmd;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,6 +17,7 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
     Bukkit.getPluginManager().registerEvents(this, this);
 
     getCommand("challenge").setExecutor(new ChallengeCmd());
+    getCommand("challenge-menu").setExecutor(new ChallengeMenuCmd());
   }
 
   @EventHandler
