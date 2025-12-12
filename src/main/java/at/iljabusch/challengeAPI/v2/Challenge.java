@@ -1,11 +1,12 @@
-package at.iljabusch.challengeAPI.challenges.sharedhealth;
+package at.iljabusch.challengeAPI.v2;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
-import at.iljabusch.challengeAPI.Challenge;
-import at.iljabusch.challengeAPI.ChallengeCreationException;
+import at.iljabusch.challengeAPI.v2.modifiers.Modifier;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -13,25 +14,29 @@ import org.mvplugins.multiverse.core.MultiverseCoreApi;
 import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.options.CreateWorldOptions;
 
-public class SharedHealthChallenge implements Challenge {
+@Getter
 
-  private ArrayList<Player> players;
+public class Challenge {
+
   private MultiverseWorld world;
+  private ArrayList<Player> players;
+  @Setter
+  private Set<Modifier> modifiers;
 
-  public void onCreate(List<Player> players) throws ChallengeCreationException {
-    if (players.size() < 2) {
-      throw new ChallengeCreationException("Challenge requires at least 2 players");
-    }
-    players.forEach(player -> {
+  public Challenge(ArrayList<Player> players) {
+    getLogger().info("Creating a new challenge!");
+
+    this.players = players;
+    this.players.forEach(player -> {
       player.setHealthScaled(false);
       player.setHealth(player.getAttribute(Attribute.MAX_HEALTH).getValue());
+      player.setFoodLevel(20); // Fully fed
     });
-    this.players = new ArrayList<>(players);
 
     // TODO: Delete world once challenge ends
     MultiverseCoreApi.get().getWorldManager()
         .createWorld(
-            CreateWorldOptions.worldName("world_" + getClass().getSimpleName() + UUID.randomUUID())
+            CreateWorldOptions.worldName("world_challenge_" + UUID.randomUUID())
                 .environment(Environment.NORMAL))
         .onFailure(reason -> {
           getLogger().error("Failed to create world for challenge: {}", reason);
@@ -43,15 +48,17 @@ public class SharedHealthChallenge implements Challenge {
   }
 
   public void onJoin(Player player) {
-    player.setHealth(players.getFirst().getHealth());
     players.add(player);
     player.teleport(world.getSpawnLocation());
   }
 
   public void onLeave(Player player) {
     players.remove(player);
-    if (!players.isEmpty()) return;
+    if (!players.isEmpty()) {
+      return;
+    }
 
     getLogger().info("Challenge closing because all players left!");
+    // TODO: Actually close challenge, delete world, ...
   }
 }

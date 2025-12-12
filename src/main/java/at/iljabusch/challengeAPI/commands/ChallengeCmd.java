@@ -1,12 +1,13 @@
 package at.iljabusch.challengeAPI.commands;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
-import at.iljabusch.challengeAPI.Challenge;
-import at.iljabusch.challengeAPI.PluginState;
-import at.iljabusch.challengeAPI.challenges.sharedhealth.SharedHealthChallenge;
+import at.iljabusch.challengeAPI.GlobalState;
+import at.iljabusch.challengeAPI.v2.Challenge;
+import at.iljabusch.challengeAPI.v2.modifiers.Modifier;
+import at.iljabusch.challengeAPI.v2.modifiers.SharedHealthModifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,15 +20,16 @@ public class ChallengeCmd implements CommandExecutor, TabExecutor {
   private final ArrayList<Challenge> challenges = new ArrayList<>();
 
   @Override
-  public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
-      @NotNull String label, @NotNull String @NotNull [] args) {
+  public boolean onCommand(@NotNull CommandSender sender,
+                           @NotNull Command command,
+                           @NotNull String label,
+                           @NotNull String @NotNull [] args) {
     if (sender instanceof Player player) {
       if (args.length != 2) {
         return false;
       }
 
-      if (args[0].equalsIgnoreCase("create")) {
-        var otherPlayer = sender.getServer().getPlayer(args[1]);
+        /*var otherPlayer = sender.getServer().getPlayer(args[1]);
         if (otherPlayer == null) {
           sender.sendMessage("The player is not online!");
           return true;
@@ -35,12 +37,13 @@ public class ChallengeCmd implements CommandExecutor, TabExecutor {
         if (otherPlayer.getPlayer() == player) {
           sender.sendMessage("The player cannot be yourself!");
           return false;
-        }
-
+        }*/
+      if (args[0].equalsIgnoreCase("create")) {
         getLogger().info("Creating a new shared health challenge");
-        var challenge = new SharedHealthChallenge();
-        challenge.onCreate(List.of(player, otherPlayer));
-        PluginState.getInstance().registerNewChallenge(challenge, List.of(player, otherPlayer));
+
+        var challenge = new Challenge(new ArrayList<>(List.of(player)));
+        challenge.setModifiers(Set.of(new SharedHealthModifier(challenge)));
+        GlobalState.getInstance().registerNewChallenge(challenge, challenge.getPlayers());
       }
       return true;
     }
@@ -51,9 +54,9 @@ public class ChallengeCmd implements CommandExecutor, TabExecutor {
 
   @Override
   public @Nullable List<String> onTabComplete(@NotNull CommandSender sender,
-      @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
-    getLogger().info(Arrays.toString(args));
-    getLogger().info(args.length);
+                                              @NotNull Command command,
+                                              @NotNull String label,
+                                              @NotNull String @NotNull [] args) {
     return switch (args.length) {
       case 1 -> List.of("create", "join");
       case 2 -> sender.getServer().getOnlinePlayers().stream().map(Player::getName).toList();

@@ -8,7 +8,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ChallengeAPI extends JavaPlugin implements Listener {
-  private PluginState state = PluginState.getInstance();
+  private GlobalState state = GlobalState.getInstance();
 
   @Override
   public void onEnable() {
