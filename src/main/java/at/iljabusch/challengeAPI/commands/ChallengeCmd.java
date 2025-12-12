@@ -1,10 +1,9 @@
 package at.iljabusch.challengeAPI.commands;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
+import at.iljabusch.challengeAPI.Challenge;
 import at.iljabusch.challengeAPI.GlobalState;
-import at.iljabusch.challengeAPI.v2.Challenge;
-import at.iljabusch.challengeAPI.v2.modifiers.Modifier;
-import at.iljabusch.challengeAPI.v2.modifiers.SharedHealthModifier;
+import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -25,11 +24,17 @@ public class ChallengeCmd implements CommandExecutor, TabExecutor {
                            @NotNull String label,
                            @NotNull String @NotNull [] args) {
     if (sender instanceof Player player) {
-      if (args.length != 2) {
+      if (args.length < 1) {
         return false;
       }
 
-        /*var otherPlayer = sender.getServer().getPlayer(args[1]);
+      var players = new ArrayList<>(List.of(player));
+      for (int i = 0; i < args.length; i++) {
+        if (i == 0) {
+          continue;
+        }
+
+        var otherPlayer = sender.getServer().getPlayer(args[1]);
         if (otherPlayer == null) {
           sender.sendMessage("The player is not online!");
           return true;
@@ -37,11 +42,14 @@ public class ChallengeCmd implements CommandExecutor, TabExecutor {
         if (otherPlayer.getPlayer() == player) {
           sender.sendMessage("The player cannot be yourself!");
           return false;
-        }*/
+        }
+        players.add(otherPlayer);
+      }
+
       if (args[0].equalsIgnoreCase("create")) {
         getLogger().info("Creating a new shared health challenge");
 
-        var challenge = new Challenge(new ArrayList<>(List.of(player)));
+        var challenge = new Challenge(players);
         challenge.setModifiers(Set.of(new SharedHealthModifier(challenge)));
         GlobalState.getInstance().registerNewChallenge(challenge, challenge.getPlayers());
       }
@@ -57,10 +65,12 @@ public class ChallengeCmd implements CommandExecutor, TabExecutor {
                                               @NotNull Command command,
                                               @NotNull String label,
                                               @NotNull String @NotNull [] args) {
-    return switch (args.length) {
-      case 1 -> List.of("create", "join");
-      case 2 -> sender.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
-      default -> List.of();
-    };
+    if (args.length == 1) {
+      return List.of("create");
+    }
+    if (args.length > 1) {
+      return sender.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
+    }
+    return List.of();
   }
 }

@@ -1,13 +1,13 @@
-package at.iljabusch.challengeAPI.v2.modifiers;
+package at.iljabusch.challengeAPI.modifiers.sharedhealth;
 
 import static org.bukkit.Bukkit.getServer;
+import at.iljabusch.challengeAPI.Challenge;
 import at.iljabusch.challengeAPI.ChallengeAPI;
-import at.iljabusch.challengeAPI.v2.Challenge;
+import at.iljabusch.challengeAPI.modifiers.Modifier;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class SharedHealthModifier extends Modifier implements Listener {
+public class SharedHealthModifier extends Modifier {
 
   public SharedHealthModifier(Challenge challenge) {
     super(challenge);

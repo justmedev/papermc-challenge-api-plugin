@@ -1,7 +1,7 @@
-package at.iljabusch.challengeAPI.v2;
+package at.iljabusch.challengeAPI;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
-import at.iljabusch.challengeAPI.v2.modifiers.Modifier;
+import at.iljabusch.challengeAPI.modifiers.Modifier;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -25,7 +25,6 @@ public class Challenge {
 
   public Challenge(ArrayList<Player> players) {
     getLogger().info("Creating a new challenge!");
-
     this.players = players;
     this.players.forEach(player -> {
       player.setHealthScaled(false);

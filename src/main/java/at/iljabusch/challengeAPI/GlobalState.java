@@ -1,6 +1,5 @@
 package at.iljabusch.challengeAPI;
 
-import at.iljabusch.challengeAPI.v2.Challenge;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
