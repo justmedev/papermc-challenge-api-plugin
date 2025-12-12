@@ -5,14 +5,17 @@ import at.iljabusch.challengeAPI.Challenge;
 import at.iljabusch.challengeAPI.PluginState;
 import at.iljabusch.challengeAPI.challenges.sharedhealth.SharedHealthChallenge;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class ChallengeCmd implements CommandExecutor {
+public class ChallengeCmd implements CommandExecutor, TabExecutor {
   private final ArrayList<Challenge> challenges = new ArrayList<>();
 
   @Override
@@ -29,6 +32,10 @@ public class ChallengeCmd implements CommandExecutor {
           sender.sendMessage("The player is not online!");
           return true;
         }
+        if (otherPlayer.getPlayer() == player) {
+          sender.sendMessage("The player cannot be yourself!");
+          return false;
+        }
 
         getLogger().info("Creating a new shared health challenge");
         var challenge = new SharedHealthChallenge();
@@ -40,5 +47,17 @@ public class ChallengeCmd implements CommandExecutor {
 
     sender.sendMessage("You must be a player!");
     return false;
+  }
+
+  @Override
+  public @Nullable List<String> onTabComplete(@NotNull CommandSender sender,
+      @NotNull Command command, @NotNull String label, @NotNull String @NotNull [] args) {
+    getLogger().info(Arrays.toString(args));
+    getLogger().info(args.length);
+    return switch (args.length) {
+      case 1 -> List.of("create", "join");
+      case 2 -> sender.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
+      default -> List.of();
+    };
   }
 }
