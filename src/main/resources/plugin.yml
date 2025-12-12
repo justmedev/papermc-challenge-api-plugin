@@ -1,0 +1,11 @@
+name: ChallengeAPI
+version: '1.0-SNAPSHOT'
+main: at.iljabusch.challengeAPI.ChallengeAPI
+api-version: '1.21'
+prefix: ChallengeAPI
+authors: [ Ilja Busch ]
+depend: ['Multiverse-Core']
+commands:
+  basic:
+    description: Do something with challenges
+    usage: /challenge [join]
