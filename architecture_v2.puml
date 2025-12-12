@@ -1,0 +1,32 @@
+@startuml
+hide empty members
+hide empty methods
+
+interface Modifier {
+  onCreate()
+}
+
+class SharedHealthModifier
+
+class TimedModifier
+
+class Challenge {
+  world: MvcWorld
+  modifiers: ArrayList<Modifier>
+  players: ArrayList<Player>
+}
+
+class Player
+
+class GlobalState
+
+Modifier <|-- SharedHealthModifier
+Modifier <|-- TimedModifier
+Challenge *-- Modifier
+
+Challenge o-- Player
+'ActiveChallenge *-- Challenge
+'ActiveChallenge *-- Player
+
+GlobalState *-- Challenge
+@enduml
