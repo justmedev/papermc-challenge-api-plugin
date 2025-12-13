@@ -15,6 +15,7 @@ public class ChallengeMenuItem {
   private boolean isActive;
 
   public ItemStack getGuiItem() {
+    // TODO: disallow reserved materials
     return ChallengeCreationMenu.createGuiItem(
         mod.displayItem(),
         mod.name(),

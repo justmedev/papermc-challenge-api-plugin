@@ -1,5 +1,6 @@
 package at.iljabusch.challengeAPI.menus;
 
+import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.ChallengeAPI;
 import at.iljabusch.challengeAPI.GlobalState;
 import java.util.Arrays;
@@ -15,7 +16,15 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class ChallengeCreationMenu implements InventoryHolder {
+  public static Material CREATE_CHALLENGE_MATERIAL = Material.GREEN_BANNER;
 
+  /// ```
+  /// Inventory (9x3) M=modifier, S=start challenge, r=reserved, e=must be empty
+  ///  0  1  2  3  4  5  6  7  8   <--   INDEX
+  /// [M][M][M][M][M][M][M][e][S]
+  /// [M][M][M][M][ ][ ][ ][e][r]
+  /// [ ][ ][ ][ ][ ][ ][ ][e][r]
+  /// ```
   private final Inventory inventory;
   private final HashMap<Integer, ChallengeMenuItem> inventoryMap = new HashMap<>();
 
@@ -27,9 +36,28 @@ public class ChallengeCreationMenu implements InventoryHolder {
       var registeredMod = GlobalState.getInstance().getRegisteredModifiers().get(i);
       var cmi = new ChallengeMenuItem(registeredMod, false);
 
-      this.inventory.setItem(i, cmi.getGuiItem());
-      inventoryMap.put(i, cmi);
+      // This is done to skip e, S and r fields!
+      var index = i;
+      if (index > 6) {
+        index += 2;
+      }
+      if (index > 15) {
+        index += 2;
+      }
+      if (index > 7 * 3) {
+        getLogger().warn("Too many modifiers! Paging not yet supported");
+        return;
+      }
+      if (registeredMod.displayItem() == CREATE_CHALLENGE_MATERIAL) {
+        getLogger().warn("{} is not allowed for modifiers!", CREATE_CHALLENGE_MATERIAL);
+        continue;
+      }
+
+      this.inventory.setItem(index, cmi.getGuiItem());
+      inventoryMap.put(index, cmi);
     }
+
+    this.inventory.setItem(8, createGuiItem(CREATE_CHALLENGE_MATERIAL, "Create challenge"));
 
     Bukkit.getPluginManager().registerEvents(new ChallengeCreationMenuListener(), plugin);
   }
