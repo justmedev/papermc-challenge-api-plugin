@@ -2,7 +2,7 @@ package at.iljabusch.challengeAPI.commands;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.Challenge;
-import at.iljabusch.challengeAPI.GlobalState;
+import at.iljabusch.challengeAPI.ChallengeManager;
 import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +48,9 @@ public class ChallengeCmd implements CommandExecutor, TabExecutor {
         getLogger().info("Creating a new shared health challenge");
 
 
-        var challenge = new Challenge(players);
-        challenge.setModifiers(Set.of(new SharedHealthModifier(challenge)));
-        GlobalState.getInstance().registerNewChallenge(challenge, challenge.getPlayers());
+        // var challenge = new Challenge(player);
+        // challenge.setModifiers(Set.of(new SharedHealthModifier(challenge)));
+        // ChallengeManager.getInstance().registerNewChallenge(challenge, challenge.getPlayers());
       }
       return true;
     }

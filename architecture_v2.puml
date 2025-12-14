@@ -18,7 +18,7 @@ class Challenge {
 
 class Player
 
-class GlobalState
+class ChallengeManager
 
 Modifier <|-- SharedHealthModifier
 Modifier <|-- TimedModifier
@@ -28,5 +28,5 @@ Challenge o-- Player
 'ActiveChallenge *-- Challenge
 'ActiveChallenge *-- Player
 
-GlobalState *-- Challenge
+ChallengeManager *-- Challenge
 @enduml

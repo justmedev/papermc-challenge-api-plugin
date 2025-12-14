@@ -1,0 +1,9 @@
+@startuml
+- User opens challenge creation inventory/menu
+- User enables modifiers
+- User clicks "create challenge"
+- Challenge is created (but nobody gets a tp yet)
+- User can invite people into the challenge
+- Invited people get a massage and can accept with /challenge-accept
+- Once the user issues /start-challenge everybody is dropped into the challenge world and the challenge starts
+@enduml

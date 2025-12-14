@@ -1,28 +1,25 @@
 package at.iljabusch.challengeAPI;
 
-import at.iljabusch.challengeAPI.modifiers.Modifier;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
-import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.UUID;
 import lombok.Getter;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 @Getter
-public class GlobalState {
+public class ChallengeManager {
 
   // region Singleton Pattern
-  private static GlobalState instance;
+  private static ChallengeManager instance;
 
-  private GlobalState() {
+  private ChallengeManager() {
   }
 
-  public static synchronized GlobalState getInstance() {
+  public static synchronized ChallengeManager getInstance() {
     if (instance == null) {
-      instance = new GlobalState();
+      instance = new ChallengeManager();
     }
     return instance;
   }
@@ -32,11 +29,15 @@ public class GlobalState {
   private final HashMap<UUID, PlayerInChallenge> playersInChallenges = new HashMap<>();
   private final ArrayList<Challenge> activeChallenges = new ArrayList<>();
 
-  public void registerNewChallenge(Challenge challenge, Collection<Player> players) {
+  public void registerNewChallenge(Challenge challenge, Player creator) {
+    playersInChallenges.put(creator.getUniqueId(), new PlayerInChallenge(challenge, creator));
+    activeChallenges.add(challenge);
+  }
+
+  public void registerPlayersInChallenge(Challenge challenge, Collection<Player> players) {
     players.forEach(p -> {
       playersInChallenges.put(p.getUniqueId(), new PlayerInChallenge(challenge, p));
     });
-    activeChallenges.add(challenge);
   }
 
   public void registerModifier(RegisteredModifier registeredModifier) {

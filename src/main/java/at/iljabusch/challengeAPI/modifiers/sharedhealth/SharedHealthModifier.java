@@ -15,6 +15,9 @@ public class SharedHealthModifier extends Modifier {
   }
 
   @Override
+  public void onChallengeStarted() {}
+
+  @Override
   public void onPlayerJoin(Player player) {
     var otherPlayer = challenge.getPlayers().getFirst();
     player.setFoodLevel(otherPlayer.getFoodLevel());

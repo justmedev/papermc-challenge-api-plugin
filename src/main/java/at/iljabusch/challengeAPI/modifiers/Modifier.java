@@ -12,5 +12,7 @@ public abstract class Modifier {
     this.challenge = challenge;
   }
 
+  public abstract  void onChallengeStarted();
+
   public abstract void onPlayerJoin(Player player);
 }

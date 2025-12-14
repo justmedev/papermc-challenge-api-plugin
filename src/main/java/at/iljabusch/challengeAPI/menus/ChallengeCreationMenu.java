@@ -2,8 +2,10 @@ package at.iljabusch.challengeAPI.menus;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.ChallengeAPI;
-import at.iljabusch.challengeAPI.GlobalState;
+import at.iljabusch.challengeAPI.ChallengeManager;
+import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -32,8 +34,8 @@ public class ChallengeCreationMenu implements InventoryHolder {
     var plugin = JavaPlugin.getPlugin(ChallengeAPI.class);
     this.inventory = plugin.getServer().createInventory(this, 9 * 3);
 
-    for (int i = 0; i < GlobalState.getInstance().getRegisteredModifiers().size(); i++) {
-      var registeredMod = GlobalState.getInstance().getRegisteredModifiers().get(i);
+    for (int i = 0; i < ChallengeManager.getInstance().getRegisteredModifiers().size(); i++) {
+      var registeredMod = ChallengeManager.getInstance().getRegisteredModifiers().get(i);
       var cmi = new ChallengeMenuItem(registeredMod, false);
 
       // This is done to skip e, S and r fields!
@@ -80,5 +82,9 @@ public class ChallengeCreationMenu implements InventoryHolder {
 
   public @Nullable ChallengeMenuItem getMenuItemAtIndex(int index) {
     return this.inventoryMap.get(index);
+  }
+
+  public @NonNull Collection<RegisteredModifier> getActiveModifiers() {
+    return this.inventoryMap.values().stream().map(ChallengeMenuItem::getMod).toList();
   }
 }

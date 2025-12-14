@@ -12,14 +12,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ChallengeAPI extends JavaPlugin implements Listener {
-  private GlobalState state = GlobalState.getInstance();
+  private ChallengeManager state = ChallengeManager.getInstance();
 
   @Override
   public void onEnable() {
     getLogger().info("ChallengeAPI Plugin is starting ...");
     Bukkit.getPluginManager().registerEvents(this, this);
 
-    GlobalState.getInstance().registerModifier(
+    ChallengeManager.getInstance().registerModifier(
         new RegisteredModifier(
             "Shared-Health",
             "Ilja Busch",
@@ -41,7 +41,7 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
     }
 
     player.setPlayer(event.getPlayer());
-    player.getChallenge().onJoin(player.getPlayer());
+    player.getChallenge().join(player.getPlayer());
     player.getPlayer().sendMessage("Rejoining challenge!");
   }
 
