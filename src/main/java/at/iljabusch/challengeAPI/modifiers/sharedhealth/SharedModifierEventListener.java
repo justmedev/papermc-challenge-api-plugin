@@ -1,6 +1,6 @@
 package at.iljabusch.challengeAPI.modifiers.sharedhealth;
 
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,7 +27,10 @@ public class SharedModifierEventListener implements Listener {
       if (player.getUniqueId() == p.getUniqueId()) {
         return;
       }
-      p.sendMessage(Component.text("&e%s&c has been damaged!".formatted(player.getName())));
+      p.sendRichMessage(
+          "<yellow>Player <dark_red><player></dark_red> has been damaged!",
+          Placeholder.component("player", player.name())
+      );
       p.setHealth(player.getHealth() - event.getFinalDamage());
     });
   }

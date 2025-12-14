@@ -7,9 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -29,7 +27,7 @@ public class Challenge {
   private Set<RegisteredModifier> modifiers;
 
   public Challenge(Player creator, Set<RegisteredModifier> modifiers) {
-    creator.sendMessage(Component.text("§6Creating challenge ...§r"));
+    creator.sendRichMessage("<gold>Creating challenge ...");
     this.modifiers = modifiers;
 
     this.players.add(creator);
@@ -51,40 +49,23 @@ public class Challenge {
           // TODO: Handle this
         })
         .onSuccess(world -> {
-          creator.sendMessage(Component.text("§6Challenge world created ...§r"));
           this.world = world;
           this.state = ChallengeState.READY;
 
-          var message = Component
-              .text("Your challenge was created successfully!", NamedTextColor.GOLD)
-              .append(Component.text("\nSelected modifiers: ", NamedTextColor.GOLD))
-              .append(Component.text(
-                  String.join(", ", modifiers.stream().map(RegisteredModifier::name).toList()),
-                  NamedTextColor.DARK_RED
-              ))
-              .append(Component.text("Use ", NamedTextColor.GOLD))
-              .append(Component.text("/challenge-invite", NamedTextColor.DARK_RED)
-                          .clickEvent(ClickEvent.runCommand("challenge-invite")))
-              .append(Component.text(
-                  " to invite other players to your challenge! ",
-                  NamedTextColor.GOLD
-              ))
-              .append(Component.text("When ready start the challenge using ", NamedTextColor.GOLD))
-              .append(Component.text("/challenge-accept", NamedTextColor.DARK_RED)
-                          .clickEvent(ClickEvent.runCommand("challenge-accept")))
-              .append(Component.text("!", NamedTextColor.GOLD));
-          creator.sendMessage(message);
-
-          /*creator.sendMessage(Component.text("""
-                                                 §eLoading challenge world ...
-                                                 §k§f---------------------------------§r§6
-                                                 §6Your challenge was created successfully!
-                                                 §6Selected modifiers: §4%s§r
-                                                 §6You can now use the §e/challenge-invite §6command, to invite players to your challenge.
-                                                 §6When ready, you can start the challenge by executing §e/challenge-start§6. Everybody will be teleported to the challenge world and the challenge begins!."""
-                                                 .formatted(modifiers.stream()
-                                                                .map(RegisteredModifier::name))
-          ));*/
+          creator.sendRichMessage(
+              """
+                  <gold>Your challenge was created successfully!
+                  Selected modifiers: <dark_red><modifiers></dark_red>
+                  Use <dark_red><click:suggest_command:"/challenge invite ">/challenge invite <players></click></dark_red> to invite others to your challenge!
+                  Use <dark_red><click:run_command:"/challenge start">/challenge start</click></dark_red> to start the challenge!""",
+              Placeholder.unparsed(
+                  "modifiers",
+                  String.join(
+                      ", ",
+                      modifiers.stream().map(RegisteredModifier::name).toList()
+                  )
+              )
+          );
         });
   }
 
@@ -92,15 +73,15 @@ public class Challenge {
     this.state = ChallengeState.ONGOING;
 
     players.forEach(p -> {
-      p.sendMessage(Component.text("§6Challenge started ...§r"));
+      p.sendRichMessage("<gold>Challenge started!");
       p.teleport(world.getSpawnLocation());
     });
   }
 
   public void join(Player player) {
+    player.sendRichMessage("<gold>Rejoining challenge!");
     players.add(player);
     if (this.state == ChallengeState.ONGOING) {
-      player.sendMessage(Component.text("§6Rejoining challenge ...§r"));
       player.teleport(world.getSpawnLocation());
     }
   }

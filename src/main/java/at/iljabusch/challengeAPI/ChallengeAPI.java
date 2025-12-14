@@ -1,9 +1,9 @@
 package at.iljabusch.challengeAPI;
 
 import at.iljabusch.challengeAPI.commands.ChallengeCmd;
-import at.iljabusch.challengeAPI.commands.ChallengeMenuCmd;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ChallengeAPI extends JavaPlugin implements Listener {
-  private ChallengeManager state = ChallengeManager.getInstance();
+  private final ChallengeManager state = ChallengeManager.getInstance();
 
   @Override
   public void onEnable() {
@@ -28,8 +28,11 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
         )
     );
 
-    getCommand("challenge").setExecutor(new ChallengeCmd());
-    getCommand("challenge-menu").setExecutor(new ChallengeMenuCmd());
+    getLifecycleManager().registerEventHandler(
+        LifecycleEvents.COMMANDS, commands -> {
+          commands.registrar().register(ChallengeCmd.challengeCommand());
+        }
+    );
   }
 
   @EventHandler
@@ -42,7 +45,6 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
 
     player.setPlayer(event.getPlayer());
     player.getChallenge().join(player.getPlayer());
-    player.getPlayer().sendMessage("Rejoining challenge!");
   }
 
   @Override

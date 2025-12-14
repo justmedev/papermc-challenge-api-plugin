@@ -1,75 +1,81 @@
 package at.iljabusch.challengeAPI.commands;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
-import at.iljabusch.challengeAPI.Challenge;
-import at.iljabusch.challengeAPI.ChallengeManager;
-import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabExecutor;
+import at.iljabusch.challengeAPI.menus.ChallengeCreationMenu;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class ChallengeCmd implements CommandExecutor, TabExecutor {
-  @Override
-  public boolean onCommand(@NotNull CommandSender sender,
-                           @NotNull Command command,
-                           @NotNull String label,
-                           @NotNull String @NotNull [] args) {
-    if (sender instanceof Player player) {
-      if (args.length < 1) {
-        return false;
-      }
+public class ChallengeCmd {
 
-      var players = new ArrayList<>(List.of(player));
-      for (int i = 0; i < args.length; i++) {
-        if (i == 0) {
-          continue;
-        }
+  public static LiteralCommandNode<CommandSourceStack> challengeCommand() {
+    var rootCmd = Commands.literal("challenge");
 
-        var otherPlayer = sender.getServer().getPlayer(args[1]);
-        if (otherPlayer == null) {
-          sender.sendMessage("The player is not online!");
-          return true;
-        }
-        if (otherPlayer.getPlayer() == player) {
-          sender.sendMessage("The player cannot be yourself!");
-          return false;
-        }
-        players.add(otherPlayer);
-      }
+    var createCmd = Commands.literal("create")
+        .executes(ChallengeCmd::runCreateLogic);
 
-      if (args[0].equalsIgnoreCase("create")) {
-        getLogger().info("Creating a new shared health challenge");
+    var inviteCmd = Commands.literal("invite")
+        .executes(ctx -> {
+          ctx.getSource().getSender()
+              .sendRichMessage("<red>You have to include the required argument players!</red>");
+          return Command.SINGLE_SUCCESS;
+        })
+        .then(
+            Commands.argument("players", ArgumentTypes.players())
+                .executes(ChallengeCmd::runInviteLogic)
+        );
 
-
-        // var challenge = new Challenge(player);
-        // challenge.setModifiers(Set.of(new SharedHealthModifier(challenge)));
-        // ChallengeManager.getInstance().registerNewChallenge(challenge, challenge.getPlayers());
-      }
-      return true;
-    }
-
-    sender.sendMessage("You must be a player!");
-    return false;
+    rootCmd.then(createCmd);
+    rootCmd.then(inviteCmd);
+    return rootCmd.build();
   }
 
-  @Override
-  public @Nullable List<String> onTabComplete(@NotNull CommandSender sender,
-                                              @NotNull Command command,
-                                              @NotNull String label,
-                                              @NotNull String @NotNull [] args) {
-    if (args.length == 1) {
-      return List.of("create");
+  private static int runInviteLogic(CommandContext<CommandSourceStack> ctx)
+      throws CommandSyntaxException {
+    if (!(ctx.getSource().getExecutor() instanceof Player executor)) {
+      ctx.getSource().getSender().sendRichMessage(
+          "<red>Only players are allowed to invite other players to challenges!</red>");
+      return Command.SINGLE_SUCCESS;
     }
-    if (args.length > 1) {
-      return sender.getServer().getOnlinePlayers().stream().map(Player::getName).toList();
+
+    final var playerSelectorArgResolver = ctx.getArgument(
+        "players",
+        PlayerSelectorArgumentResolver.class
+    );
+    final var players = playerSelectorArgResolver.resolve(ctx.getSource());
+
+    players.forEach(e -> {
+      if (e == executor) {
+        return;
+      }
+      e.sendRichMessage(
+          """
+              <gold>You've been invited to a challenge by <dark_red><invitee></dark_red>!
+              <gold>Use <click:run_command:"/challenge accept %s"><dark_red>/challenge accept <invitee></dark_red></click> to accept the challenge!"""
+              .formatted(executor.getName()),
+          Placeholder.component("invitee", executor.name())
+      );
+    });
+
+    return Command.SINGLE_SUCCESS;
+  }
+
+  private static int runCreateLogic(CommandContext<CommandSourceStack> ctx) {
+    var sender = ctx.getSource().getSender();
+    if (!(sender instanceof Player) || !(ctx.getSource()
+        .getExecutor() instanceof Player executor)) {
+      sender.sendRichMessage("<red>Only players can use this command!");
+      return Command.SINGLE_SUCCESS;
     }
-    return List.of();
+
+    executor.openInventory(new ChallengeCreationMenu().getInventory());
+    return Command.SINGLE_SUCCESS;
   }
 }

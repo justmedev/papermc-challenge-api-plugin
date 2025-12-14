@@ -8,7 +8,4 @@ depend: ['Multiverse-Core']
 commands:
   challenge:
     description: Do something with challenges
-    usage: /challenge [join]
-  challenge-menu:
-    description: Challenges
-    usage: /challenge-menu to open a menu
+    usage: /challenge [create|invite|accept] <players>
