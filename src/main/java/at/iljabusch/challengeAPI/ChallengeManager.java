@@ -101,7 +101,7 @@ public class ChallengeManager {
       return;
     }
 
-    if (playersInChallenges.containsKey(invitee.getUniqueId())) {
+    if (playersInChallenges.containsKey(invited.getUniqueId())) {
       invited.sendRichMessage("<red>You are already partaking in another challenge!");
       return;
     }
@@ -117,5 +117,21 @@ public class ChallengeManager {
         "<dark_red><invited></dark_red><gold> accepted your invite!",
         Placeholder.component("invited", invited.name())
     );
+  }
+
+  public void startChallenge(Player creator) {
+    var playerInChallenge = playersInChallenges.get(creator.getUniqueId());
+    if (playerInChallenge == null) {
+      creator.sendRichMessage("<red>You are not partaking in a challenge!");
+      return;
+    }
+
+    if (playerInChallenge.getChallenge().getCreatorUUID() != creator.getUniqueId()) {
+      creator.sendRichMessage("<red>Only a challenges creator can start it!");
+      return;
+    }
+
+    playerInChallenge.getChallenge().start();
+    creator.sendRichMessage("<gold>Challenge started successfully! Teleporting ...");
   }
 }

@@ -21,7 +21,7 @@ public class ChallengeCmd {
     var createCmd = Commands.literal("create")
         .executes(ChallengeCmd::runCreateLogic);
 
-    var inviteCmd = Commands.literal("invite")
+    var createInviteCmd = Commands.literal("invite")
         .executes(ctx -> {
           ctx.getSource().getSender()
               .sendRichMessage("<red>You have to include the required argument players!</red>");
@@ -46,10 +46,14 @@ public class ChallengeCmd {
     var leaveCmd = Commands.literal("leave")
             .executes(ChallengeCmd::runLeaveChallengeLogic);
 
+    var startCmd = Commands.literal("start")
+        .executes(ChallengeCmd::runStartLogic);
+
     rootCmd.then(createCmd);
-    rootCmd.then(inviteCmd);
+    rootCmd.then(createInviteCmd);
     rootCmd.then(acceptInviteCmd);
     rootCmd.then(leaveCmd);
+    rootCmd.then(startCmd);
     return rootCmd.build();
   }
 
@@ -118,6 +122,18 @@ public class ChallengeCmd {
     }
 
     ChallengeManager.getInstance().leaveChallenge(executor);
+    return Command.SINGLE_SUCCESS;
+  }
+
+  private static int runStartLogic(CommandContext<CommandSourceStack> ctx) {
+    var sender = ctx.getSource().getSender();
+    if (!(sender instanceof Player) || !(ctx.getSource()
+        .getExecutor() instanceof Player executor)) {
+      sender.sendRichMessage("<red>Only players can use this command!");
+      return Command.SINGLE_SUCCESS;
+    }
+
+    ChallengeManager.getInstance().startChallenge(executor);
     return Command.SINGLE_SUCCESS;
   }
 }

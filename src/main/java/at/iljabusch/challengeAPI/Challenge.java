@@ -2,6 +2,8 @@ package at.iljabusch.challengeAPI;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -22,6 +24,7 @@ public class Challenge {
   private ChallengeState state;
 
   private MultiverseWorld world;
+  private UUID creatorUUID;
   private final ArrayList<Player> players = new ArrayList<>();
   @Setter
   private Set<RegisteredModifier> modifiers;
@@ -30,6 +33,7 @@ public class Challenge {
     creator.sendRichMessage("<gold>Creating challenge ...");
     this.modifiers = modifiers;
 
+    this.creatorUUID = creator.getUniqueId();
     this.players.add(creator);
     this.players.forEach(player -> {
       player.setHealthScaled(false);
@@ -71,6 +75,15 @@ public class Challenge {
 
   public void start() {
     this.state = ChallengeState.ONGOING;
+    this.modifiers.forEach(registered -> {
+      try {
+        var mod = registered.modifier().getConstructor(Challenge.class).newInstance(this);
+        mod.onChallengeStarted();
+      } catch (Exception e) {
+        getLogger().error("Unable to instantiate modifier! Did you forget to add a constructor with a challenge arg?");
+        getLogger().error(e);
+      }
+    });
 
     players.forEach(p -> {
       p.sendRichMessage("<gold>Challenge started!");
@@ -79,11 +92,12 @@ public class Challenge {
   }
 
   public void join(Player player) {
-    player.sendRichMessage("<gold>Rejoining challenge!");
     players.add(player);
-    if (this.state == ChallengeState.ONGOING) {
-      player.teleport(world.getSpawnLocation());
+    if (this.state == ChallengeState.READY) {
+      player.sendRichMessage("<gold>Challenge joined!");
+      return;
     }
+    player.sendRichMessage("<gold>Challenge rejoined!");
   }
 
   public void leave(Player player) {

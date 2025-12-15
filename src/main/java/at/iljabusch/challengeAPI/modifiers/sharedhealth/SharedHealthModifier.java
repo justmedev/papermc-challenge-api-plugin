@@ -11,11 +11,12 @@ public class SharedHealthModifier extends Modifier {
 
   public SharedHealthModifier(Challenge challenge) {
     super(challenge);
-    getServer().getPluginManager().registerEvents(new SharedModifierEventListener(this), JavaPlugin.getPlugin(ChallengeAPI.class));
   }
 
   @Override
-  public void onChallengeStarted() {}
+  public void onChallengeStarted() {
+    getServer().getPluginManager().registerEvents(new SharedModifierEventListener(this), JavaPlugin.getPlugin(ChallengeAPI.class));
+  }
 
   @Override
   public void onPlayerJoin(Player player) {
