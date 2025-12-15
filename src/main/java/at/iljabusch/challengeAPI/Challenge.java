@@ -79,12 +79,17 @@ public class Challenge {
     });
 
     players.forEach(p -> {
-      p.sendRichMessage("<gold>Challenge started!");
-      p.teleport(world.getSpawnLocation());
+      p.sendRichMessage("<gold>Challenge started! Teleporting ...");
+      p.teleportAsync(world.getSpawnLocation()).thenAccept(success -> {
+        if (!success) {
+          getLogger().error("teleportAsync failed while trying to teleport players to started challenge!");
+          return;
+        }
 
-      p.setHealthScaled(false);
-      p.setHealth(p.getAttribute(Attribute.MAX_HEALTH).getValue());
-      p.setFoodLevel(20); // Fully fed
+        p.setHealthScaled(false);
+        p.setHealth(p.getAttribute(Attribute.MAX_HEALTH).getValue());
+        p.setFoodLevel(20); // Fully fed
+      });
     });
   }
 
@@ -99,7 +104,7 @@ public class Challenge {
 
   public void leave(Player player) {
     if (players.remove(player) && state == ChallengeState.ONGOING) {
-      player.teleport(MultiverseCoreApi.get().getWorldManager().getDefaultWorld().getOrNull().getSpawnLocation());
+      player.teleportAsync(MultiverseCoreApi.get().getWorldManager().getDefaultWorld().getOrNull().getSpawnLocation());
     }
     if (!players.isEmpty()) {
       return;
