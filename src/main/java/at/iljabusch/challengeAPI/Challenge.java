@@ -7,7 +7,10 @@ import java.util.Set;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.title.Title;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -19,11 +22,10 @@ import org.mvplugins.multiverse.core.world.options.CreateWorldOptions;
 
 public class Challenge {
 
-  private ChallengeState state;
-
-  private MultiverseWorld world;
-  private UUID creatorUUID;
   private final ArrayList<Player> players = new ArrayList<>();
+  private ChallengeState state;
+  private MultiverseWorld world;
+  private final UUID creatorUUID;
   @Setter
   private Set<RegisteredModifier> modifiers;
 
@@ -71,24 +73,34 @@ public class Challenge {
     this.modifiers.forEach(registered -> {
       try {
         var mod = registered.modifier().getConstructor(Challenge.class).newInstance(this);
-        mod.onChallengeStarted();
+        mod.onChallengeStarted(); // TODO: this should be called after each player is teleported!
       } catch (Exception e) {
-        getLogger().error("Unable to instantiate modifier! Did you forget to add a constructor with a challenge arg?");
+        getLogger().error(
+            "Unable to instantiate modifier! Did you forget to add a constructor with a challenge arg?");
         getLogger().error(e);
       }
     });
 
     players.forEach(p -> {
       p.sendRichMessage("<gold>Challenge started! Teleporting ...");
+      p.showTitle(
+          Title.title(Component.text("Loading ...", NamedTextColor.GOLD), Component.empty()));
+
       p.teleportAsync(world.getSpawnLocation()).thenAccept(success -> {
         if (!success) {
-          getLogger().error("teleportAsync failed while trying to teleport players to started challenge!");
+          getLogger().error(
+              "teleportAsync failed while trying to teleport players to started challenge!");
+          // TODO: HANDLE
           return;
         }
 
         p.setHealthScaled(false);
         p.setHealth(p.getAttribute(Attribute.MAX_HEALTH).getValue());
         p.setFoodLevel(20); // Fully fed
+        p.clearActivePotionEffects();
+        p.clearActiveItem();
+        p.clearTitle();
+        p.getInventory().clear();
       });
     });
   }
@@ -104,7 +116,8 @@ public class Challenge {
 
   public void leave(Player player) {
     if (players.remove(player) && state == ChallengeState.ONGOING) {
-      player.teleportAsync(MultiverseCoreApi.get().getWorldManager().getDefaultWorld().getOrNull().getSpawnLocation());
+      player.teleportAsync(MultiverseCoreApi.get().getWorldManager().getDefaultWorld().getOrNull()
+                               .getSpawnLocation());
     }
     if (!players.isEmpty()) {
       return;

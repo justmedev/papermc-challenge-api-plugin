@@ -4,7 +4,7 @@ main: at.iljabusch.challengeAPI.ChallengeAPI
 api-version: '1.21'
 prefix: ChallengeAPI
 authors: [ Ilja Busch ]
-depend: ['Multiverse-Core']
+depend: [ 'Multiverse-Core' ]
 commands:
   challenge:
     description: Do something with challenges

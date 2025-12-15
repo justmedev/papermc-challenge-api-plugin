@@ -44,7 +44,7 @@ public class ChallengeCmd {
         );
 
     var leaveCmd = Commands.literal("leave")
-            .executes(ChallengeCmd::runLeaveChallengeLogic);
+        .executes(ChallengeCmd::runLeaveChallengeLogic);
 
     var startCmd = Commands.literal("start")
         .executes(ChallengeCmd::runStartLogic);

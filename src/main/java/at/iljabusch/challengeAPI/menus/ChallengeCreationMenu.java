@@ -18,6 +18,7 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class ChallengeCreationMenu implements InventoryHolder {
+
   public static Material CREATE_CHALLENGE_MATERIAL = Material.GREEN_BANNER;
 
   /// ```

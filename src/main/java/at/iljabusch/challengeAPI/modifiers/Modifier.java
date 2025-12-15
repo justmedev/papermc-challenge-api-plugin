@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 
 public abstract class Modifier {
+
   @Getter
   protected Challenge challenge;
 
@@ -12,7 +13,7 @@ public abstract class Modifier {
     this.challenge = challenge;
   }
 
-  public abstract  void onChallengeStarted();
+  public abstract void onChallengeStarted();
 
   public abstract void onPlayerJoin(Player player);
 }
