@@ -1,5 +1,6 @@
 package at.iljabusch.challengeAPI.commands;
 
+import at.iljabusch.challengeAPI.ChallengeManager;
 import at.iljabusch.challengeAPI.menus.ChallengeCreationMenu;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
@@ -9,7 +10,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 
@@ -32,8 +32,24 @@ public class ChallengeCmd {
                 .executes(ChallengeCmd::runInviteLogic)
         );
 
+    var acceptInviteCmd = Commands.literal("accept")
+        .executes(ctx -> {
+          ctx.getSource().getSender()
+              .sendRichMessage("<red>You have to include the required argument player!</red>");
+          return Command.SINGLE_SUCCESS;
+        })
+        .then(
+            Commands.argument("player", ArgumentTypes.player())
+                .executes(ChallengeCmd::runAcceptInviteLogic)
+        );
+
+    var leaveCmd = Commands.literal("leave")
+            .executes(ChallengeCmd::runLeaveChallengeLogic);
+
     rootCmd.then(createCmd);
     rootCmd.then(inviteCmd);
+    rootCmd.then(acceptInviteCmd);
+    rootCmd.then(leaveCmd);
     return rootCmd.build();
   }
 
@@ -55,6 +71,7 @@ public class ChallengeCmd {
       if (e == executor) {
         return;
       }
+      ChallengeManager.getInstance().invitePlayerToChallenge(executor, e);
       e.sendRichMessage(
           """
               <gold>You've been invited to a challenge by <dark_red><invitee></dark_red>!
@@ -67,6 +84,19 @@ public class ChallengeCmd {
     return Command.SINGLE_SUCCESS;
   }
 
+  // TODO: Multiple invites per person
+  private static int runAcceptInviteLogic(CommandContext<CommandSourceStack> ctx) {
+    var sender = ctx.getSource().getSender();
+    if (!(sender instanceof Player) || !(ctx.getSource()
+        .getExecutor() instanceof Player executor)) {
+      sender.sendRichMessage("<red>Only players can use this command!");
+      return Command.SINGLE_SUCCESS;
+    }
+
+    ChallengeManager.getInstance().acceptInviteToChallenge(executor);
+    return Command.SINGLE_SUCCESS;
+  }
+
   private static int runCreateLogic(CommandContext<CommandSourceStack> ctx) {
     var sender = ctx.getSource().getSender();
     if (!(sender instanceof Player) || !(ctx.getSource()
@@ -76,6 +106,18 @@ public class ChallengeCmd {
     }
 
     executor.openInventory(new ChallengeCreationMenu().getInventory());
+    return Command.SINGLE_SUCCESS;
+  }
+
+  private static int runLeaveChallengeLogic(CommandContext<CommandSourceStack> ctx) {
+    var sender = ctx.getSource().getSender();
+    if (!(sender instanceof Player) || !(ctx.getSource()
+        .getExecutor() instanceof Player executor)) {
+      sender.sendRichMessage("<red>Only players can use this command!");
+      return Command.SINGLE_SUCCESS;
+    }
+
+    ChallengeManager.getInstance().leaveChallenge(executor);
     return Command.SINGLE_SUCCESS;
   }
 }

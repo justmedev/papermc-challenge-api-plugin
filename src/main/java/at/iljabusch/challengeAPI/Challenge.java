@@ -87,7 +87,9 @@ public class Challenge {
   }
 
   public void leave(Player player) {
-    players.remove(player);
+    if (players.remove(player) && state == ChallengeState.ONGOING) {
+      player.teleport(MultiverseCoreApi.get().getWorldManager().getDefaultWorld().getOrNull().getSpawnLocation());
+    }
     if (!players.isEmpty()) {
       return;
     }
