@@ -2,8 +2,6 @@ package at.iljabusch.challengeAPI;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -35,11 +33,6 @@ public class Challenge {
 
     this.creatorUUID = creator.getUniqueId();
     this.players.add(creator);
-    this.players.forEach(player -> {
-      player.setHealthScaled(false);
-      player.setHealth(player.getAttribute(Attribute.MAX_HEALTH).getValue());
-      player.setFoodLevel(20); // Fully fed
-    });
 
     // TODO: Delete world once challenge ends
     MultiverseCoreApi.get().getWorldManager()
@@ -88,6 +81,10 @@ public class Challenge {
     players.forEach(p -> {
       p.sendRichMessage("<gold>Challenge started!");
       p.teleport(world.getSpawnLocation());
+
+      p.setHealthScaled(false);
+      p.setHealth(p.getAttribute(Attribute.MAX_HEALTH).getValue());
+      p.setFoodLevel(20); // Fully fed
     });
   }
 
