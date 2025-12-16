@@ -16,13 +16,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 @Getter
 public class ChallengeManager {
 
-  // region Singleton Pattern
   private static ChallengeManager instance;
-  // endregion Singleton Pattern
+
   private final ArrayList<RegisteredModifier> registeredModifiers = new ArrayList<>();
   private final HashMap<UUID, PlayerInChallenge> playersInChallenges = new HashMap<>();
   private final HashMap<UUID, ChallengeInvite> pendingInvites = new HashMap<>();
-  private final ArrayList<Challenge> activeChallenges = new ArrayList<>();
+
   private ChallengeManager() {
   }
 
@@ -35,7 +34,6 @@ public class ChallengeManager {
 
   public void registerNewChallenge(Challenge challenge, Player creator) {
     playersInChallenges.put(creator.getUniqueId(), new PlayerInChallenge(challenge, creator));
-    activeChallenges.add(challenge);
   }
 
   public void registerPlayersInChallenge(Challenge challenge, Collection<Player> players) {
@@ -47,6 +45,10 @@ public class ChallengeManager {
 
   public void registerModifier(RegisteredModifier registeredModifier) {
     registeredModifiers.add(registeredModifier);
+  }
+
+  public boolean canCreateChallenge(Player player) {
+    return !playersInChallenges.containsKey(player.getUniqueId());
   }
 
   public void leaveChallenge(Player player) {

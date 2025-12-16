@@ -109,6 +109,10 @@ public class ChallengeCmd {
       return Command.SINGLE_SUCCESS;
     }
 
+    if (!ChallengeManager.getInstance().canCreateChallenge(executor)) {
+      sender.sendRichMessage("<red>You cannot create a challenge at this moment!");
+      return Command.SINGLE_SUCCESS;
+    }
     executor.openInventory(new ChallengeCreationMenu().getInventory());
     return Command.SINGLE_SUCCESS;
   }

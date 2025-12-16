@@ -61,8 +61,6 @@ public class ChallengeCreationMenu implements InventoryHolder {
     }
 
     this.inventory.setItem(8, createGuiItem(CREATE_CHALLENGE_MATERIAL, "Create challenge"));
-
-    Bukkit.getPluginManager().registerEvents(new ChallengeCreationMenuListener(), plugin);
   }
 
   public static ItemStack createGuiItem(Material material, String name, final String... lore) {

@@ -5,6 +5,7 @@ import at.iljabusch.challengeAPI.Challenge;
 import at.iljabusch.challengeAPI.ChallengeAPI;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class SharedHealthModifier extends Modifier {

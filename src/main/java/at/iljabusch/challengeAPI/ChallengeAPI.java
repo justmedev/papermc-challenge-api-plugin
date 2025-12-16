@@ -1,6 +1,7 @@
 package at.iljabusch.challengeAPI;
 
 import at.iljabusch.challengeAPI.commands.ChallengeCmd;
+import at.iljabusch.challengeAPI.menus.ChallengeCreationMenuListener;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -19,6 +20,7 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
   public void onEnable() {
     getLogger().info("ChallengeAPI Plugin is starting ...");
     Bukkit.getPluginManager().registerEvents(this, this);
+    Bukkit.getPluginManager().registerEvents(new ChallengeCreationMenuListener(), this);
 
     ChallengeManager.getInstance().registerModifier(
         new RegisteredModifier(

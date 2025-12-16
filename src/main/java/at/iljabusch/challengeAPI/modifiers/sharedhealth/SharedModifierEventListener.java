@@ -1,12 +1,13 @@
 package at.iljabusch.challengeAPI.modifiers.sharedhealth;
 
+import at.iljabusch.challengeAPI.modifiers.ModifierListener;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-public class SharedModifierEventListener implements Listener {
+public class SharedModifierEventListener implements ModifierListener {
 
   private final SharedHealthModifier modifier;
 
@@ -14,7 +15,7 @@ public class SharedModifierEventListener implements Listener {
     this.modifier = modifier;
   }
 
-  @EventHandler
+  @EventHandler(ignoreCancelled = true)
   public void onPlayerDamage(EntityDamageEvent event) {
     if (!(event.getEntity() instanceof Player player)) {
       return;
@@ -33,5 +34,10 @@ public class SharedModifierEventListener implements Listener {
       );
       p.setHealth(player.getHealth() - event.getFinalDamage());
     });
+  }
+
+  @Override
+  public void dispose() {
+    EntityDamageEvent.getHandlerList().unregister(this);
   }
 }
