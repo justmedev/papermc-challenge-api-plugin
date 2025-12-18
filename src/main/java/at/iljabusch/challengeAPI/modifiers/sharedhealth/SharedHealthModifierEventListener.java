@@ -29,7 +29,7 @@ public class SharedHealthModifierEventListener implements ModifierListener {
   }
 
   public boolean isPlayerNotPartOfChallenge(Player player) {
-    return !modifier.getChallenge().getPlayers().contains(player);
+    return !modifier.getChallenge().getPlayerUUIDs().contains(player);
   }
 
 
@@ -39,7 +39,7 @@ public class SharedHealthModifierEventListener implements ModifierListener {
     int food = source.getFoodLevel();
     float saturation = source.getSaturation();
 
-    for (Player p : modifier.getChallenge().getPlayers()) {
+    for (Player p : modifier.getChallenge().getOnlinePlayers()) {
       if (p.getUniqueId().equals(source.getUniqueId())) {
         continue;
       }

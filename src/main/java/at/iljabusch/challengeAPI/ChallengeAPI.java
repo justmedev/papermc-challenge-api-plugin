@@ -4,12 +4,14 @@ import at.iljabusch.challengeAPI.commands.ChallengeCmd;
 import at.iljabusch.challengeAPI.menus.ChallengeCreationMenuListener;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
+import at.iljabusch.challengeAPI.modifiers.stopwatch.StopwatchModifier;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ChallengeAPI extends JavaPlugin implements Listener {
@@ -30,6 +32,14 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
             SharedHealthModifier.class
         )
     );
+    ChallengeManager.getInstance().registerModifier(
+        new RegisteredModifier(
+            "Stopwatch",
+            "Ilja Busch",
+            Material.CLOCK,
+            StopwatchModifier.class
+        )
+    );
 
     getLifecycleManager().registerEventHandler(
         LifecycleEvents.COMMANDS, commands -> {
@@ -48,6 +58,16 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
 
     player.setPlayer(event.getPlayer());
     player.getChallenge().join(player.getPlayer());
+  }
+
+  @EventHandler
+  public void onPlayerLeave(PlayerQuitEvent event) {
+    var player = state.getPlayersInChallenges().get(event.getPlayer().getUniqueId());
+    if (player == null) {
+      return;
+    }
+
+    player.getChallenge().leaveServer(player.getPlayer());
   }
 
   @Override

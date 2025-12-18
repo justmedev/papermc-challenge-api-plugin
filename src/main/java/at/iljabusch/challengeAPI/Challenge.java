@@ -18,6 +18,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.title.Title;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World.Environment;
@@ -40,7 +41,7 @@ public class Challenge {
   private static final String WORLD_PREFIX = "world_challenge";
 
   private final LocalDateTime startedAt = LocalDateTime.now();
-  private final ArrayList<Player> players = new ArrayList<>();
+  private final ArrayList<UUID> playerUUIDs = new ArrayList<>();
   private final UUID creatorUUID;
   private final ChallengeWorlds worlds = new ChallengeWorlds();
   private final UUID worldUUID = UUID.randomUUID();
@@ -54,7 +55,7 @@ public class Challenge {
     this.registeredModifiers = modifiers;
 
     this.creatorUUID = creator.getUniqueId();
-    this.players.add(creator);
+    this.playerUUIDs.add(this.creatorUUID);
 
     AtomicInteger successCount = new AtomicInteger();
     for (Environment env : List.of(Environment.NORMAL, Environment.NETHER, Environment.THE_END)) {
@@ -97,7 +98,11 @@ public class Challenge {
   }
 
   private Optional<Player> getCreator() {
-    return players.stream().filter(p -> p.getUniqueId() == creatorUUID).findFirst();
+    return getOnlinePlayers().stream().filter(p -> p.getUniqueId() == creatorUUID).findFirst();
+  }
+
+  public List<Player> getOnlinePlayers() {
+    return playerUUIDs.stream().map(p -> Bukkit.getServer().getPlayer(p)).toList();
   }
 
   private void handleWorldCreationFailure(
@@ -106,7 +111,7 @@ public class Challenge {
     getCreator().ifPresent(
         player -> player.sendRichMessage("<red>Failed to create challenge!")
     );
-    players.forEach(this::leave);
+    getOnlinePlayers().forEach(this::leave);
   }
 
   public void start() {
@@ -129,7 +134,7 @@ public class Challenge {
     });
 
     AtomicInteger successCount = new AtomicInteger();
-    players.forEach(p -> {
+    getOnlinePlayers().forEach(p -> {
       p.sendRichMessage("<gold>Challenge started! Teleporting ...");
       p.showTitle(
           Title.title(Component.text("Loading ...", NamedTextColor.GOLD), Component.empty()));
@@ -158,7 +163,7 @@ public class Challenge {
               p.clearTitle();
               p.getInventory().clear();
 
-              if (successCount.get() >= players.size()) {
+              if (successCount.get() >= playerUUIDs.size()) {
                 this.modifiers.forEach(Modifier::onChallengeStarted);
               }
             }
@@ -168,7 +173,7 @@ public class Challenge {
   }
 
   public void join(Player player) {
-    players.add(player);
+    this.playerUUIDs.add(player.getUniqueId());
     if (this.state == ChallengeState.READY) {
       player.sendRichMessage("<gold>Challenge joined!");
       return;
@@ -181,14 +186,14 @@ public class Challenge {
   }
 
   public void leave(Player player) {
-    if (players.remove(player) && state.isOngoingOrCompleted()) {
+    if (playerUUIDs.remove(player.getUniqueId()) && state.isOngoingOrCompleted()) {
       player.teleportAsync(MultiverseCoreApi.get()
                                .getWorldManager()
                                .getDefaultWorld()
                                .getOrNull()
                                .getSpawnLocation());
     }
-    if (!players.isEmpty()) {
+    if (!playerUUIDs.isEmpty()) {
       return;
     }
 
@@ -201,9 +206,13 @@ public class Challenge {
     }
   }
 
+  public void leaveServer(Player player) {
+    this.modifiers.forEach(mod -> mod.onPlayerLeave(player));
+  }
+
   public void complete(boolean completedSuccessfully) {
     state = completedSuccessfully ? ChallengeState.COMPLETED : ChallengeState.FAILED;
-    players.forEach(p -> {
+    getOnlinePlayers().forEach(p -> {
       p.clearActivePotionEffects();
       p.getInventory().clear();
       p.setHealth(p.getAttribute(Attribute.MAX_HEALTH).getValue());

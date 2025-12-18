@@ -192,7 +192,7 @@ public class ChallengeCmd {
                 ", ",
                 playerInChallenge
                     .getChallenge()
-                    .getPlayers()
+                    .getOnlinePlayers()
                     .stream()
                     .map(Player::getName)
                     .toList()

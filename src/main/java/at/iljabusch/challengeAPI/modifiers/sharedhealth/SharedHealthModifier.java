@@ -26,7 +26,7 @@ public class SharedHealthModifier extends Modifier {
 
   @Override
   public void onPlayerJoin(Player player) {
-    var possibleSource = challenge.getPlayers().getFirst();
+    var possibleSource = challenge.getOnlinePlayers().getFirst();
     if (possibleSource.equals(player)) {
       return;
     }
