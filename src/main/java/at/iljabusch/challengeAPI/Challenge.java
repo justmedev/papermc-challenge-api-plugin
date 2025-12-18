@@ -1,6 +1,7 @@
 package at.iljabusch.challengeAPI;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
+import at.iljabusch.challengeAPI.modifiers.Modifier;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +40,12 @@ public class Challenge {
   private final UUID worldUUID = UUID.randomUUID();
   private ChallengeState state;
   @Setter
-  private Set<RegisteredModifier> modifiers;
+  private Set<RegisteredModifier> registeredModifiers;
+  private Set<Modifier> modifiers;
 
   public Challenge(Player creator, Set<RegisteredModifier> modifiers) {
     creator.sendRichMessage("<gold>Creating challenge ...");
-    this.modifiers = modifiers;
+    this.registeredModifiers = modifiers;
 
     this.creatorUUID = creator.getUniqueId();
     this.players.add(creator);
@@ -110,10 +112,11 @@ public class Challenge {
     }
 
     this.state = ChallengeState.ONGOING;
-    this.modifiers.forEach(registered -> {
+    this.registeredModifiers.forEach(registered -> {
       try {
         var mod = registered.modifier().getConstructor(Challenge.class).newInstance(this);
         mod.onChallengeStarted(); // TODO: this should be called after each player is teleported!
+        this.modifiers.add(mod);
       } catch (Exception e) {
         getLogger().error(
             "Unable to instantiate modifier! Did you forget to add a constructor with a challenge arg?");
@@ -152,11 +155,15 @@ public class Challenge {
       player.sendRichMessage("<gold>Challenge joined!");
       return;
     }
+
+    if (this.state == ChallengeState.ONGOING) {
+      modifiers.forEach(mod -> mod.onPlayerJoin(player));
+    }
     player.sendRichMessage("<gold>Challenge rejoined!");
   }
 
   public void leave(Player player) {
-    if (players.remove(player) && state.hasStartedOrCompleted()) {
+    if (players.remove(player) && state.isOngoingOrCompleted()) {
       player.teleportAsync(MultiverseCoreApi.get()
                                .getWorldManager()
                                .getDefaultWorld()
@@ -174,10 +181,6 @@ public class Challenge {
           .getWorldManager()
           .deleteWorld(DeleteWorldOptions.world(world));
     }
-  }
-
-  public void complete() {
-    complete(false);
   }
 
   public void complete(boolean completedSuccessfully) {

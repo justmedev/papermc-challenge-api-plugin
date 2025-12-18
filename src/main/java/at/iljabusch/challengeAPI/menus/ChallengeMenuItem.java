@@ -23,7 +23,7 @@ public class ChallengeMenuItem {
         mod.name(),
         Component.text(mod.author()),
         isActive ? Component.text("[Enabled]", NamedTextColor.GREEN)
-            : Component.text("[Enabled]", NamedTextColor.RED)
+            : Component.text("[Disabled]", NamedTextColor.RED)
     );
   }
 }

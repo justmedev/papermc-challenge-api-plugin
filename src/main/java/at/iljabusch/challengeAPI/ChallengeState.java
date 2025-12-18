@@ -7,7 +7,7 @@ public enum ChallengeState {
   COMPLETED,
   FAILED;
 
-  boolean hasStartedOrCompleted() {
+  boolean isOngoingOrCompleted() {
     return this == ONGOING || this == COMPLETED || this == FAILED;
   }
 }

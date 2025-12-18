@@ -1,56 +1,119 @@
 package at.iljabusch.challengeAPI.modifiers.sharedhealth;
 
+import at.iljabusch.challengeAPI.ChallengeAPI;
 import at.iljabusch.challengeAPI.modifiers.ModifierListener;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.jspecify.annotations.NonNull;
 
 public class SharedHealthModifierEventListener implements ModifierListener {
 
   private final SharedHealthModifier modifier;
+  private final ChallengeAPI plugin = JavaPlugin.getPlugin(ChallengeAPI.class);
+
+  // Guard set to prevent infinite event loops
+  private final Set<UUID> isSyncing = new HashSet<>();
 
   public SharedHealthModifierEventListener(SharedHealthModifier modifier) {
     this.modifier = modifier;
   }
 
+  public boolean isPlayerNotPartOfChallenge(Player player) {
+    return !modifier.getChallenge().getPlayers().contains(player);
+  }
+
+
+  void syncAll(@NonNull Player source) {
+    double health = source.getHealth();
+    double absorption = source.getAbsorptionAmount();
+    int food = source.getFoodLevel();
+    float saturation = source.getSaturation();
+
+    for (Player p : modifier.getChallenge().getPlayers()) {
+      if (p.getUniqueId().equals(source.getUniqueId())) {
+        continue;
+      }
+
+      // Add to guard set before making changes; This prevents recursive calling
+      isSyncing.add(p.getUniqueId());
+
+      try {
+        p.setHealth(Math.min(health, p.getAttribute(Attribute.MAX_HEALTH).getValue()));
+        p.setAbsorptionAmount(absorption);
+        p.setFoodLevel(food);
+        p.setSaturation(saturation);
+
+        for (PotionEffect effect : source.getActivePotionEffects()) {
+          p.addPotionEffect(effect);
+        }
+      } finally {
+        isSyncing.remove(p.getUniqueId());
+      }
+    }
+  }
+
   @EventHandler(ignoreCancelled = true)
-  public void onPlayerDamage(EntityDamageEvent event) {
-    if (!(event.getEntity() instanceof Player player)) {
+  public void onDamage(EntityDamageEvent event) {
+    if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
       return;
     }
-    if (!modifier.getChallenge().getPlayers().contains(player)) {
+    if (isPlayerNotPartOfChallenge(p)) {
       return;
     }
 
-    var newHealth = player.getHealth() - event.getFinalDamage();
-
-    if (newHealth <= 0) {
-      player.sendRichMessage("<dark_red>You have died");
-      modifier.getChallenge().complete(false);
+    if (p.getHealth() - event.getFinalDamage() <= 0) {
       event.setCancelled(true);
+      modifier.getChallenge().complete(false);
+      return;
     }
 
-    modifier.getChallenge().getPlayers().forEach(p -> {
-      if (player.getUniqueId() == p.getUniqueId()) {
-        return;
-      }
-      if (newHealth <= 0) {
-        p.sendRichMessage(
-            "<yellow>Player <dark_red><player></dark_red> has died!",
-            Placeholder.component("player", player.name())
-        );
-        modifier.getChallenge().complete(false);
-        event.setCancelled(true);
-        return;
-      }
+    plugin.getServer().getScheduler().runTask(plugin, () -> syncAll(p));
+  }
 
-      p.sendRichMessage(
-          "<yellow>Player <dark_red><player></dark_red> has been damaged!",
-          Placeholder.component("player", player.name())
-      );
-      p.setHealth(newHealth);
-    });
+  @EventHandler(ignoreCancelled = true)
+  public void onRegen(EntityRegainHealthEvent event) {
+    if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
+      return;
+    }
+    if (isPlayerNotPartOfChallenge(p)) {
+      return;
+    }
+
+    plugin.getServer().getScheduler().runTask(plugin, () -> syncAll(p));
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onFoodChange(FoodLevelChangeEvent event) {
+    if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
+      return;
+    }
+    if (isPlayerNotPartOfChallenge(p)) {
+      return;
+    }
+
+    plugin.getServer().getScheduler().runTask(plugin, () -> syncAll(p));
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onPotion(EntityPotionEffectEvent event) {
+    if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
+      return;
+    }
+    if (isPlayerNotPartOfChallenge(p)) {
+      return;
+    }
+
+    plugin.getServer().getScheduler().runTask(plugin, () -> syncAll(p));
   }
 
   @Override

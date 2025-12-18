@@ -9,6 +9,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class SharedHealthModifier extends Modifier {
 
+  private final SharedHealthModifierEventListener eventListener = new SharedHealthModifierEventListener(
+      this);
+
   public SharedHealthModifier(Challenge challenge) {
     super(challenge);
   }
@@ -16,15 +19,17 @@ public class SharedHealthModifier extends Modifier {
   @Override
   public void onChallengeStarted() {
     getServer().getPluginManager().registerEvents(
-        new SharedHealthModifierEventListener(this),
+        eventListener,
         JavaPlugin.getPlugin(ChallengeAPI.class)
     );
   }
 
   @Override
   public void onPlayerJoin(Player player) {
-    var otherPlayer = challenge.getPlayers().getFirst();
-    player.setFoodLevel(otherPlayer.getFoodLevel());
-    player.setHealth(otherPlayer.getHealth());
+    var possibleSource = challenge.getPlayers().getFirst();
+    if (possibleSource.equals(player)) {
+      return;
+    }
+    eventListener.syncAll(possibleSource);
   }
 }

@@ -175,7 +175,7 @@ public class ChallengeCmd {
                 ", ",
                 playerInChallenge
                     .getChallenge()
-                    .getModifiers()
+                    .getRegisteredModifiers()
                     .stream()
                     .map(RegisteredModifier::name)
                     .toList()
