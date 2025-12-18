@@ -3,6 +3,7 @@ package at.iljabusch.challengeAPI;
 import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ public class Challenge {
 
   private static final String WORLD_PREFIX = "world_challenge";
 
+  private final LocalDateTime startedAt = LocalDateTime.now();
   private final ArrayList<Player> players = new ArrayList<>();
   private final UUID creatorUUID;
   private final ChallengeWorlds worlds = new ChallengeWorlds();
@@ -126,6 +128,7 @@ public class Challenge {
       }
     });
 
+    AtomicInteger successCount = new AtomicInteger();
     players.forEach(p -> {
       p.sendRichMessage("<gold>Challenge started! Teleporting ...");
       p.showTitle(
@@ -146,6 +149,7 @@ public class Challenge {
 
         Utils.waitForChunksLoaded(
             p, p.getLocation(), () -> {
+              successCount.getAndIncrement();
               p.setHealthScaled(false);
               p.setHealth(p.getAttribute(Attribute.MAX_HEALTH).getValue());
               p.setFoodLevel(20); // Fully fed
@@ -153,7 +157,10 @@ public class Challenge {
               p.clearActiveItem();
               p.clearTitle();
               p.getInventory().clear();
-              this.modifiers.forEach(Modifier::onChallengeStarted);
+
+              if (successCount.get() >= players.size()) {
+                this.modifiers.forEach(Modifier::onChallengeStarted);
+              }
             }
         );
       });
@@ -186,7 +193,7 @@ public class Challenge {
     }
 
     getLogger().info("Challenge closing because all players left!");
-
+    modifiers.forEach(Modifier::onDispose);
     for (MultiverseWorld world : List.of(worlds.normal, worlds.nether, worlds.theEnd)) {
       MultiverseCoreApi.get()
           .getWorldManager()

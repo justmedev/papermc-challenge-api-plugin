@@ -32,4 +32,9 @@ public class SharedHealthModifier extends Modifier {
     }
     eventListener.syncAll(possibleSource);
   }
+
+  @Override
+  public void onDispose() {
+    eventListener.dispose();
+  }
 }

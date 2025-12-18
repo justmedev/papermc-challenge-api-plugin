@@ -15,5 +15,12 @@ public abstract class Modifier {
 
   public abstract void onChallengeStarted();
 
-  public abstract void onPlayerJoin(Player player);
+  public void onPlayerJoin(Player player) {
+  }
+
+  public void onPlayerLeave(Player player) {
+  }
+
+  public void onDispose() {
+  }
 }
