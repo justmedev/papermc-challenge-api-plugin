@@ -23,9 +23,9 @@ import org.mvplugins.multiverse.core.world.options.CreateWorldOptions;
 public class Challenge {
 
   private final ArrayList<Player> players = new ArrayList<>();
+  private final UUID creatorUUID;
   private ChallengeState state;
   private MultiverseWorld world;
-  private final UUID creatorUUID;
   @Setter
   private Set<RegisteredModifier> modifiers;
 
