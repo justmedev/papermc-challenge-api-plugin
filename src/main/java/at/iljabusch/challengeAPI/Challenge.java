@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -21,9 +22,11 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.mvplugins.multiverse.core.MultiverseCoreApi;
@@ -37,6 +40,8 @@ import org.mvplugins.multiverse.core.world.reasons.CreateFailureReason;
 @Getter
 
 public class Challenge {
+
+  private static final ChallengeAPI plugin = JavaPlugin.getPlugin(ChallengeAPI.class);
 
   private static final String WORLD_PREFIX = "world_challenge";
 
@@ -102,7 +107,11 @@ public class Challenge {
   }
 
   public List<Player> getOnlinePlayers() {
-    return playerUUIDs.stream().map(p -> Bukkit.getServer().getPlayer(p)).toList();
+    return playerUUIDs.stream()
+        .map(p -> Bukkit.getServer().getPlayer(p))
+        .filter(Objects::nonNull)
+        .filter(OfflinePlayer::isOnline)
+        .toList();
   }
 
   private void handleWorldCreationFailure(
@@ -173,7 +182,9 @@ public class Challenge {
   }
 
   public void join(Player player) {
-    this.playerUUIDs.add(player.getUniqueId());
+    if (!this.playerUUIDs.contains(player.getUniqueId())) {
+      this.playerUUIDs.add(player.getUniqueId());
+    }
     if (this.state == ChallengeState.READY) {
       player.sendRichMessage("<gold>Challenge joined!");
       return;
@@ -207,7 +218,10 @@ public class Challenge {
   }
 
   public void leaveServer(Player player) {
-    this.modifiers.forEach(mod -> mod.onPlayerLeave(player));
+    Bukkit.getScheduler().runTask(
+        plugin,
+        () -> this.modifiers.forEach(mod -> mod.onPlayerLeave(player))
+    );
   }
 
   public void complete(boolean completedSuccessfully) {
