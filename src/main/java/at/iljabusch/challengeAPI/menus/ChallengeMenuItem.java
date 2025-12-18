@@ -4,6 +4,8 @@ import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.inventory.ItemStack;
 
 @Getter
@@ -19,8 +21,9 @@ public class ChallengeMenuItem {
     return ChallengeCreationMenu.createGuiItem(
         mod.displayItem(),
         mod.name(),
-        mod.author(),
-        isActive ? "§2[Enabled]" : "§c[Disabled]"
+        Component.text(mod.author()),
+        isActive ? Component.text("[Enabled]", NamedTextColor.GREEN)
+            : Component.text("[Enabled]", NamedTextColor.RED)
     );
   }
 }

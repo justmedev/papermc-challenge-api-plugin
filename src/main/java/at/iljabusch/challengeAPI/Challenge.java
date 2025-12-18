@@ -3,8 +3,11 @@ package at.iljabusch.challengeAPI;
 import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
@@ -17,18 +20,24 @@ import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.MultiverseCoreApi;
+import org.mvplugins.multiverse.core.utils.result.Attempt.Failure;
+import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
 import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.options.CreateWorldOptions;
 import org.mvplugins.multiverse.core.world.options.DeleteWorldOptions;
+import org.mvplugins.multiverse.core.world.reasons.CreateFailureReason;
 
 @Getter
 
 public class Challenge {
 
+  private static final String WORLD_PREFIX = "world_challenge";
+
   private final ArrayList<Player> players = new ArrayList<>();
   private final UUID creatorUUID;
   private ChallengeState state;
-  private MultiverseWorld world;
+  private final ChallengeWorlds worlds = new ChallengeWorlds();
+  private final UUID worldUUID = UUID.randomUUID();
   @Setter
   private Set<RegisteredModifier> modifiers;
 
@@ -39,39 +48,67 @@ public class Challenge {
     this.creatorUUID = creator.getUniqueId();
     this.players.add(creator);
 
-    // TODO: Delete world once challenge ends
-    MultiverseCoreApi.get().getWorldManager()
-        .createWorld(
-            CreateWorldOptions
-                .worldName("world_challenge_" + UUID.randomUUID())
-                .environment(Environment.NORMAL)
-        )
-        .onFailure(reason -> {
-          getLogger().error("Failed to create world for challenge: {}", reason);
-          // TODO: Handle this
-        })
-        .onSuccess(world -> {
-          this.world = world;
-          this.state = ChallengeState.READY;
+    AtomicInteger successCount = new AtomicInteger();
+    for (Environment env : List.of(Environment.NORMAL, Environment.NETHER, Environment.THE_END)) {
+      MultiverseCoreApi.get().getWorldManager()
+          .createWorld(
+              CreateWorldOptions
+                  .worldName(WORLD_PREFIX + "_" + worldUUID + "_" + env.name())
+                  .environment(env)
+          )
+          .onSuccess(world -> {
+            switch (world.getEnvironment()) {
+              case NORMAL -> worlds.setNormal(world);
+              case NETHER -> worlds.setNether(world);
+              case THE_END -> worlds.setTheEnd(world);
+            }
 
-          creator.sendRichMessage(
-              """
-                  <gold>Your challenge was created successfully!
-                  Selected modifiers: <dark_red><modifiers></dark_red>
-                  Use <dark_red><click:suggest_command:"/challenge invite ">/challenge invite <players></click></dark_red> to invite others to your challenge!
-                  Use <dark_red><click:run_command:"/challenge start">/challenge start</click></dark_red> to start the challenge!""",
-              Placeholder.unparsed(
-                  "modifiers",
-                  String.join(
-                      ", ",
-                      modifiers.stream().map(RegisteredModifier::name).toList()
+            var successes = successCount.getAndIncrement() + 1;
+            if (successes >= 3) {
+              this.state = ChallengeState.READY;
+
+              creator.sendRichMessage(
+                  """
+                      <gold>Your challenge was created successfully!
+                      Selected modifiers: <dark_red><modifiers></dark_red>
+                      Use <dark_red><click:suggest_command:"/challenge invite ">/challenge invite <players></click></dark_red> to invite others to your challenge!
+                      Use <dark_red><click:run_command:"/challenge start">/challenge start</click></dark_red> to start the challenge!""",
+                  Placeholder.unparsed(
+                      "modifiers",
+                      String.join(
+                          ", ",
+                          modifiers.stream().map(RegisteredModifier::name).toList()
+                      )
                   )
-              )
-          );
-        });
+              );
+            }
+          })
+          .onFailure(this::handleWorldCreationFailure)
+      ;
+    }
+  }
+
+  private Optional<Player> getCreator() {
+    return players.stream().filter(p -> p.getUniqueId() == creatorUUID).findFirst();
+  }
+
+  private void handleWorldCreationFailure(
+      Failure<LoadedMultiverseWorld, CreateFailureReason> reason) {
+    getLogger().error("Failed to create world for challenge: {}", reason);
+    getCreator().ifPresent(
+        player -> player.sendRichMessage("<red>Failed to create challenge!")
+    );
+    players.forEach(this::leave);
   }
 
   public void start() {
+    if (this.state != ChallengeState.READY) {
+      getCreator().ifPresent(
+          player -> player.sendRichMessage("<red>Unable to start the challenge! It is not ready!")
+      );
+      return;
+    }
+
     this.state = ChallengeState.ONGOING;
     this.modifiers.forEach(registered -> {
       try {
@@ -89,7 +126,7 @@ public class Challenge {
       p.showTitle(
           Title.title(Component.text("Loading ...", NamedTextColor.GOLD), Component.empty()));
 
-      p.teleportAsync(world.getSpawnLocation()).thenAccept(success -> {
+      p.teleportAsync(worlds.normal.getSpawnLocation()).thenAccept(success -> {
         if (!success) {
           getLogger().error(
               "teleportAsync failed while trying to teleport players to started challenge!");
@@ -130,9 +167,12 @@ public class Challenge {
     }
 
     getLogger().info("Challenge closing because all players left!");
-    MultiverseCoreApi.get()
-        .getWorldManager()
-        .deleteWorld(DeleteWorldOptions.world(world));
+
+    for (MultiverseWorld world : List.of(worlds.normal, worlds.nether, worlds.theEnd)) {
+      MultiverseCoreApi.get()
+          .getWorldManager()
+          .deleteWorld(DeleteWorldOptions.world(world));
+    }
   }
 
   public void complete() {

@@ -24,6 +24,13 @@ public class SharedHealthModifierEventListener implements ModifierListener {
     }
 
     var newHealth = player.getHealth() - event.getFinalDamage();
+
+    if (newHealth <= 0) {
+      player.sendRichMessage("<dark_red>You have died");
+      modifier.getChallenge().complete(false);
+      event.setCancelled(true);
+    }
+
     modifier.getChallenge().getPlayers().forEach(p -> {
       if (player.getUniqueId() == p.getUniqueId()) {
         return;
@@ -45,28 +52,6 @@ public class SharedHealthModifierEventListener implements ModifierListener {
       p.setHealth(newHealth);
     });
   }
-
-  // @EventHandler(ignoreCancelled = true)
-  // public void onPlayerDeath(EntityDeathEvent event) {
-  //   if (!(event.getEntity() instanceof Player player)) {
-  //     return;
-  //   }
-  //   if (!modifier.getChallenge().getPlayers().contains(player)) {
-  //     return;
-  //   }
-  //
-  //   modifier.getChallenge().getPlayers().forEach(p -> {
-  //     if (player.getUniqueId() == p.getUniqueId()) {
-  //       return;
-  //     }
-  //     p.sendRichMessage(
-  //         "<yellow>Player <dark_red><player></dark_red> has died!",
-  //         Placeholder.component("player", player.name())
-  //     );
-  //     p.setKiller(player);
-  //     p.setHealth(0);
-  //   });
-  // }
 
   @Override
   public void dispose() {

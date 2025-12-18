@@ -4,9 +4,9 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.ChallengeAPI;
 import at.iljabusch.challengeAPI.ChallengeManager;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -62,12 +62,12 @@ public class ChallengeCreationMenu implements InventoryHolder {
     this.inventory.setItem(8, createGuiItem(CREATE_CHALLENGE_MATERIAL, "Create challenge"));
   }
 
-  public static ItemStack createGuiItem(Material material, String name, final String... lore) {
+  public static ItemStack createGuiItem(Material material, String name, final Component... lore) {
     final var item = new ItemStack(material, 1);
     final var meta = item.getItemMeta();
 
     meta.displayName(Component.text(name));
-    meta.lore(Arrays.stream(lore).map(Component::text).toList());
+    meta.lore(List.of(lore));
     item.setItemMeta(meta);
 
     return item;
