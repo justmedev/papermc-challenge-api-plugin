@@ -31,6 +31,7 @@ tasks {
         minecraftVersion("1.21.11")
         downloadPlugins {
             hangar("Multiverse-Core", "5.3.4")
+            hangar("Multiverse-NetherPortals", "5.0.3")
         }
     }
 }

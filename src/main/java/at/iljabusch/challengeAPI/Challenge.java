@@ -64,10 +64,13 @@ public class Challenge {
 
     AtomicInteger successCount = new AtomicInteger();
     for (Environment env : List.of(Environment.NORMAL, Environment.NETHER, Environment.THE_END)) {
+      var suffix =
+          env == Environment.NETHER ? "_nether" :
+              env == Environment.THE_END ? "_the_end" : "";
       MultiverseCoreApi.get().getWorldManager()
           .createWorld(
               CreateWorldOptions
-                  .worldName(WORLD_PREFIX + "_" + worldUUID + "_" + env.name())
+                  .worldName(WORLD_PREFIX + "_" + worldUUID + suffix)
                   .environment(env)
           )
           .onSuccess(world -> {
@@ -198,22 +201,25 @@ public class Challenge {
 
   public void leave(Player player) {
     if (playerUUIDs.remove(player.getUniqueId()) && state.isOngoingOrCompleted()) {
-      player.teleportAsync(MultiverseCoreApi.get()
-                               .getWorldManager()
-                               .getDefaultWorld()
-                               .getOrNull()
-                               .getSpawnLocation());
-    }
-    if (!playerUUIDs.isEmpty()) {
-      return;
-    }
-
-    getLogger().info("Challenge closing because all players left!");
-    modifiers.forEach(Modifier::onDispose);
-    for (MultiverseWorld world : List.of(worlds.normal, worlds.nether, worlds.theEnd)) {
-      MultiverseCoreApi.get()
-          .getWorldManager()
-          .deleteWorld(DeleteWorldOptions.world(world));
+      player.teleportAsync(
+          MultiverseCoreApi.get()
+              .getWorldManager()
+              .getDefaultWorld()
+              .getOrNull()
+              .getSpawnLocation()
+      ).thenAccept(success -> {
+        if (success && playerUUIDs.isEmpty()) {
+          getLogger().info("Challenge closing because all players left!");
+          modifiers.forEach(Modifier::onDispose);
+          for (MultiverseWorld world : List.of(worlds.normal, worlds.nether, worlds.theEnd)) {
+            MultiverseCoreApi.get()
+                .getWorldManager()
+                .deleteWorld(DeleteWorldOptions.world(world))
+                .onFailure(reason -> getLogger()
+                    .warn("Failed to delete world after challenge closure: {}", reason.get()));
+          }
+        }
+      });
     }
   }
 
