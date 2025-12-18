@@ -35,9 +35,9 @@ public class Challenge {
 
   private final ArrayList<Player> players = new ArrayList<>();
   private final UUID creatorUUID;
-  private ChallengeState state;
   private final ChallengeWorlds worlds = new ChallengeWorlds();
   private final UUID worldUUID = UUID.randomUUID();
+  private ChallengeState state;
   @Setter
   private Set<RegisteredModifier> modifiers;
 
@@ -126,6 +126,7 @@ public class Challenge {
       p.showTitle(
           Title.title(Component.text("Loading ...", NamedTextColor.GOLD), Component.empty()));
 
+      Utils.resetPlayerAdvancements(p);
       p.teleportAsync(worlds.normal.getSpawnLocation()).thenAccept(success -> {
         if (!success) {
           getLogger().error(
