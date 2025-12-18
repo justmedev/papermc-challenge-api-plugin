@@ -2,8 +2,12 @@
 hide empty members
 hide empty methods
 
-interface Modifier {
-  onCreate()
+abstract class Modifier {
+  challenge: Challenge
+
+  Modifier(challenge: Challenge)
+  onChallengeStarted()
+  onPlayerJoin(player: Player)
 }
 
 class SharedHealthModifier
@@ -11,9 +15,17 @@ class SharedHealthModifier
 class TimedModifier
 
 class Challenge {
-  world: MvcWorld
-  modifiers: ArrayList<Modifier>
   players: ArrayList<Player>
+  creatorUUID: UUID
+  state: ChallengeState
+  world: MultiverseWorld
+  modifiers: ArrayList<Modifier>
+}
+
+enum ChallengeState {
+  PREPARING
+  READY
+  ONGOING
 }
 
 class Player
@@ -23,10 +35,10 @@ class ChallengeManager
 Modifier <|-- SharedHealthModifier
 Modifier <|-- TimedModifier
 Challenge *-- Modifier
+Modifier --up> Challenge
 
-Challenge o-- Player
-'ActiveChallenge *-- Challenge
-'ActiveChallenge *-- Player
+Challenge o-right- Player
+Challenge --left-> ChallengeState
 
 ChallengeManager *-- Challenge
 @enduml
