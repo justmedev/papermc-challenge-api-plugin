@@ -4,6 +4,7 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -17,9 +18,12 @@ import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.title.Title;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.mvplugins.multiverse.core.MultiverseCoreApi;
 import org.mvplugins.multiverse.core.utils.result.Attempt.Failure;
 import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
@@ -41,7 +45,7 @@ public class Challenge {
   private ChallengeState state;
   @Setter
   private Set<RegisteredModifier> registeredModifiers;
-  private Set<Modifier> modifiers;
+  private final Set<Modifier> modifiers = new HashSet<>();
 
   public Challenge(Player creator, Set<RegisteredModifier> modifiers) {
     creator.sendRichMessage("<gold>Creating challenge ...");
@@ -114,9 +118,7 @@ public class Challenge {
     this.state = ChallengeState.ONGOING;
     this.registeredModifiers.forEach(registered -> {
       try {
-        var mod = registered.modifier().getConstructor(Challenge.class).newInstance(this);
-        mod.onChallengeStarted(); // TODO: this should be called after each player is teleported!
-        this.modifiers.add(mod);
+        this.modifiers.add(registered.modifier().getConstructor(Challenge.class).newInstance(this));
       } catch (Exception e) {
         getLogger().error(
             "Unable to instantiate modifier! Did you forget to add a constructor with a challenge arg?");
@@ -128,6 +130,10 @@ public class Challenge {
       p.sendRichMessage("<gold>Challenge started! Teleporting ...");
       p.showTitle(
           Title.title(Component.text("Loading ...", NamedTextColor.GOLD), Component.empty()));
+      p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 200, 1, false, false));
+      p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 200, 255, false, false));
+      p.sendBlockChange(
+          worlds.normal.getSpawnLocation().clone().add(0, -1, 0), Material.GLASS.createBlockData());
 
       Utils.resetPlayerAdvancements(p);
       p.teleportAsync(worlds.normal.getSpawnLocation()).thenAccept(success -> {
@@ -138,13 +144,18 @@ public class Challenge {
           return;
         }
 
-        p.setHealthScaled(false);
-        p.setHealth(p.getAttribute(Attribute.MAX_HEALTH).getValue());
-        p.setFoodLevel(20); // Fully fed
-        p.clearActivePotionEffects();
-        p.clearActiveItem();
-        p.clearTitle();
-        p.getInventory().clear();
+        Utils.waitForChunksLoaded(
+            p, p.getLocation(), () -> {
+              p.setHealthScaled(false);
+              p.setHealth(p.getAttribute(Attribute.MAX_HEALTH).getValue());
+              p.setFoodLevel(20); // Fully fed
+              p.clearActivePotionEffects();
+              p.clearActiveItem();
+              p.clearTitle();
+              p.getInventory().clear();
+              this.modifiers.forEach(Modifier::onChallengeStarted);
+            }
+        );
       });
     });
   }
