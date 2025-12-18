@@ -16,7 +16,7 @@ public class SharedHealthModifier extends Modifier {
   @Override
   public void onChallengeStarted() {
     getServer().getPluginManager().registerEvents(
-        new SharedModifierEventListener(this),
+        new SharedHealthModifierEventListener(this),
         JavaPlugin.getPlugin(ChallengeAPI.class)
     );
   }

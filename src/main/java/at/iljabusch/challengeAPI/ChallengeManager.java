@@ -132,6 +132,5 @@ public class ChallengeManager {
     }
 
     playerInChallenge.getChallenge().start();
-    creator.sendRichMessage("<gold>Challenge started successfully! Teleporting ...");
   }
 }

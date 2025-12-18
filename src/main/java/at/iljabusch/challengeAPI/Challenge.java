@@ -9,14 +9,17 @@ import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.title.Title;
+import org.bukkit.GameMode;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.mvplugins.multiverse.core.MultiverseCoreApi;
 import org.mvplugins.multiverse.core.world.MultiverseWorld;
 import org.mvplugins.multiverse.core.world.options.CreateWorldOptions;
+import org.mvplugins.multiverse.core.world.options.DeleteWorldOptions;
 
 @Getter
 
@@ -115,8 +118,11 @@ public class Challenge {
   }
 
   public void leave(Player player) {
-    if (players.remove(player) && state == ChallengeState.ONGOING) {
-      player.teleportAsync(MultiverseCoreApi.get().getWorldManager().getDefaultWorld().getOrNull()
+    if (players.remove(player) && state.hasStartedOrCompleted()) {
+      player.teleportAsync(MultiverseCoreApi.get()
+                               .getWorldManager()
+                               .getDefaultWorld()
+                               .getOrNull()
                                .getSpawnLocation());
     }
     if (!players.isEmpty()) {
@@ -124,6 +130,41 @@ public class Challenge {
     }
 
     getLogger().info("Challenge closing because all players left!");
-    // TODO: Actually close challenge, delete world, ...
+    MultiverseCoreApi.get()
+        .getWorldManager()
+        .deleteWorld(DeleteWorldOptions.world(world));
+  }
+
+  public void complete() {
+    complete(false);
+  }
+
+  public void complete(boolean completedSuccessfully) {
+    state = completedSuccessfully ? ChallengeState.COMPLETED : ChallengeState.FAILED;
+    players.forEach(p -> {
+      p.clearActivePotionEffects();
+      p.getInventory().clear();
+      p.setHealth(p.getAttribute(Attribute.MAX_HEALTH).getValue());
+      p.setGameMode(GameMode.SPECTATOR);
+
+      p.sendRichMessage(
+          "<gold>You are no longer part of this challenge! use <click:run_command:\"/challenge leave\"><dark_red>/challenge leave</dark_red></click> to go back to the lobby!");
+      if (completedSuccessfully) {
+        p.showTitle(
+            Title.title(
+                Component.text("Completed!", NamedTextColor.GREEN, TextDecoration.BOLD),
+                Component.text("You are now spectating the challenge")
+            )
+        );
+        return;
+      }
+
+      p.showTitle(
+          Title.title(
+              Component.text("Failed!", NamedTextColor.RED, TextDecoration.BOLD),
+              Component.text("You are now spectating the challenge")
+          )
+      );
+    });
   }
 }

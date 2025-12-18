@@ -90,6 +90,7 @@ public class ChallengeCmd {
       );
     });
 
+    ctx.getSource().getSender().sendRichMessage("<gold>Invite sent!");
     return Command.SINGLE_SUCCESS;
   }
 
