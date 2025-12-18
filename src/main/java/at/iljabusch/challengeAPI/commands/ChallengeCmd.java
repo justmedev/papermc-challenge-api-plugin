@@ -2,6 +2,7 @@ package at.iljabusch.challengeAPI.commands;
 
 import at.iljabusch.challengeAPI.ChallengeManager;
 import at.iljabusch.challengeAPI.menus.ChallengeCreationMenu;
+import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -49,11 +50,15 @@ public class ChallengeCmd {
     var startCmd = Commands.literal("start")
         .executes(ChallengeCmd::runStartLogic);
 
+    var infoCmd = Commands.literal("info")
+        .executes(ChallengeCmd::runInfoLogic);
+
     rootCmd.then(createCmd);
     rootCmd.then(createInviteCmd);
     rootCmd.then(acceptInviteCmd);
     rootCmd.then(leaveCmd);
     rootCmd.then(startCmd);
+    rootCmd.then(infoCmd);
     return rootCmd.build();
   }
 
@@ -138,6 +143,57 @@ public class ChallengeCmd {
     }
 
     ChallengeManager.getInstance().startChallenge(executor);
+    return Command.SINGLE_SUCCESS;
+  }
+
+  private static int runInfoLogic(CommandContext<CommandSourceStack> ctx) {
+    var sender = ctx.getSource().getSender();
+    if (!(sender instanceof Player) || !(ctx.getSource()
+        .getExecutor() instanceof Player executor)) {
+      sender.sendRichMessage("<red>Only players can use this command!");
+      return Command.SINGLE_SUCCESS;
+    }
+
+    var playerInChallenge = ChallengeManager.getInstance().getPlayersInChallenges()
+        .get(executor.getUniqueId());
+    if (playerInChallenge == null) {
+      sender.sendRichMessage("<red>You are not partaking in any challenges!");
+      return Command.SINGLE_SUCCESS;
+    }
+
+    sender.sendRichMessage(
+        """
+            <gold>--- [ Challenge Info ] ---
+            <gold>Active modifiers:
+            <dark_red><modifiers></dark_red>
+            <gold>Partaking players:
+            <dark_red><players></dark_red>""",
+        Placeholder.unparsed(
+            "modifiers",
+            String.join(
+                ", ",
+                playerInChallenge
+                    .getChallenge()
+                    .getModifiers()
+                    .stream()
+                    .map(RegisteredModifier::name)
+                    .toList()
+            )
+        ),
+        Placeholder.unparsed(
+            "players",
+            String.join(
+                ", ",
+                playerInChallenge
+                    .getChallenge()
+                    .getPlayers()
+                    .stream()
+                    .map(Player::getName)
+                    .toList()
+            )
+        )
+    );
+
     return Command.SINGLE_SUCCESS;
   }
 }

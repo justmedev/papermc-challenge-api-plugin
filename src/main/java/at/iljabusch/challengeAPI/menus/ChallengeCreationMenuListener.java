@@ -10,11 +10,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 public class ChallengeCreationMenuListener implements Listener {
-  public boolean challengeAlreadyCreated = false;
-
   @EventHandler
   public void onInventoryClick(InventoryClickEvent event) {
-    if (challengeAlreadyCreated) return;
 
     var inventory = event.getInventory();
     if (!(inventory.getHolder(false) instanceof ChallengeCreationMenu myInventory)) {
@@ -31,7 +28,6 @@ public class ChallengeCreationMenuListener implements Listener {
 
       var item = myInventory.getInventory().getItem(event.getSlot());
       if (item != null && item.getType() == ChallengeCreationMenu.CREATE_CHALLENGE_MATERIAL) {
-        challengeAlreadyCreated = true;
         // Start challenge with modifiers
         var player = (Player) event.getWhoClicked();
         getLogger().info("Start challenge with selected modifiers!");

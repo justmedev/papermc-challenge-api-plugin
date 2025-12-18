@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -84,6 +83,11 @@ public class ChallengeCreationMenu implements InventoryHolder {
   }
 
   public @NonNull Collection<RegisteredModifier> getActiveModifiers() {
-    return this.inventoryMap.values().stream().map(ChallengeMenuItem::getMod).toList();
+    return this.inventoryMap
+        .values()
+        .stream()
+        .filter(ChallengeMenuItem::isActive)
+        .map(ChallengeMenuItem::getMod)
+        .toList();
   }
 }
