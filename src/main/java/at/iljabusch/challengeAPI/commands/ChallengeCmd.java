@@ -1,6 +1,7 @@
 package at.iljabusch.challengeAPI.commands;
 
 import at.iljabusch.challengeAPI.ChallengeManager;
+import at.iljabusch.challengeAPI.Permissions;
 import at.iljabusch.challengeAPI.menus.ChallengeCreationMenu;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import com.mojang.brigadier.Command;
@@ -112,6 +113,10 @@ public class ChallengeCmd {
     if (!(sender instanceof Player) || !(ctx.getSource()
         .getExecutor() instanceof Player executor)) {
       sender.sendRichMessage("<red>Only players can use this command!");
+      return Command.SINGLE_SUCCESS;
+    }
+    if (!sender.hasPermission(Permissions.CHALLENGE_CREATE)) {
+      sender.sendRichMessage("<red>You do not have permission to use this command!");
       return Command.SINGLE_SUCCESS;
     }
 

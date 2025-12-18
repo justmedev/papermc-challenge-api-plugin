@@ -8,4 +8,7 @@ depend: [ 'Multiverse-Core' ]
 commands:
   challenge:
     description: Do something with challenges
-    usage: /challenge [create|invite|accept] <players>
+permissions:
+  challangeapi.challenge.create:
+    description: "Create a challenge"
+    default: notop
