@@ -22,7 +22,7 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
   public void onEnable() {
     getLogger().info("ChallengeAPI Plugin is starting ...");
     Bukkit.getPluginManager().registerEvents(this, this);
-    Bukkit.getPluginManager().registerEvents(new ChallengeCreationMenuListener(), this);
+    Bukkit.getPluginManager().registerEvents(new ChallengeCreationMenuListener(this), this);
 
     ChallengeManager.getInstance().registerModifier(
         new RegisteredModifier(
