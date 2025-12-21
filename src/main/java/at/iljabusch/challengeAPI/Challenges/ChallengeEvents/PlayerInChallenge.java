@@ -1,5 +1,6 @@
-package at.iljabusch.challengeAPI;
+package at.iljabusch.challengeAPI.Challenges.ChallengeEvents;
 
+import at.iljabusch.challengeAPI.Challenges.Challenge;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

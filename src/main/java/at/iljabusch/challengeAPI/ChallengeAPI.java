@@ -1,5 +1,6 @@
 package at.iljabusch.challengeAPI;
 
+import at.iljabusch.challengeAPI.Challenges.ChallengeManager;
 import at.iljabusch.challengeAPI.commands.ChallengeCmd;
 import at.iljabusch.challengeAPI.menus.ChallengeCreationMenuListener;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;

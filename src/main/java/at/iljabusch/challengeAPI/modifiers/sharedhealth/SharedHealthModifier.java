@@ -1,8 +1,8 @@
 package at.iljabusch.challengeAPI.modifiers.sharedhealth;
 
 import static org.bukkit.Bukkit.getServer;
-import at.iljabusch.challengeAPI.Challenge;
 import at.iljabusch.challengeAPI.ChallengeAPI;
+import at.iljabusch.challengeAPI.Challenges.Challenge;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,27 +14,8 @@ public class SharedHealthModifier extends Modifier {
 
   public SharedHealthModifier(Challenge challenge) {
     super(challenge);
+    challenge.registerEvents(eventListener, JavaPlugin.getPlugin(ChallengeAPI.class));
+
   }
 
-  @Override
-  public void onChallengeStarted() {
-    getServer().getPluginManager().registerEvents(
-        eventListener,
-        JavaPlugin.getPlugin(ChallengeAPI.class)
-    );
-  }
-
-  @Override
-  public void onPlayerJoin(Player player) {
-    var possibleSource = challenge.getOnlinePlayers().getFirst();
-    if (possibleSource.equals(player)) {
-      return;
-    }
-    eventListener.syncAll(possibleSource);
-  }
-
-  @Override
-  public void onDispose() {
-    eventListener.dispose();
-  }
 }

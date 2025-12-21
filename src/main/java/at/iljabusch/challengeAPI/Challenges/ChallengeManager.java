@@ -1,7 +1,11 @@
-package at.iljabusch.challengeAPI;
+package at.iljabusch.challengeAPI.Challenges;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
+
+import at.iljabusch.challengeAPI.ChallengeAPI;
+import at.iljabusch.challengeAPI.Challenges.ChallengeEvents.PlayerInChallenge;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,7 +48,7 @@ public class ChallengeManager {
   }
 
   public void registerModifier(RegisteredModifier registeredModifier) {
-    registeredModifiers.add(registeredModifier);
+    this.registeredModifiers.add(registeredModifier);
   }
 
   public boolean canCreateChallenge(Player player) {

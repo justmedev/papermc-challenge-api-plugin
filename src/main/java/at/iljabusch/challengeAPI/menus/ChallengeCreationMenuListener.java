@@ -1,9 +1,10 @@
 package at.iljabusch.challengeAPI.menus;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
-import at.iljabusch.challengeAPI.Challenge;
-import at.iljabusch.challengeAPI.ChallengeManager;
 import java.util.HashSet;
+
+import at.iljabusch.challengeAPI.Challenges.Challenge;
+import at.iljabusch.challengeAPI.Challenges.ChallengeManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

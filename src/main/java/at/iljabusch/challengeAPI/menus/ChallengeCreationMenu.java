@@ -2,11 +2,12 @@ package at.iljabusch.challengeAPI.menus;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.ChallengeAPI;
-import at.iljabusch.challengeAPI.ChallengeManager;
-import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+
+import at.iljabusch.challengeAPI.Challenges.ChallengeManager;
+import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -50,7 +51,7 @@ public class ChallengeCreationMenu implements InventoryHolder {
         getLogger().warn("Too many modifiers! Paging not yet supported");
         return;
       }
-      if (registeredMod.displayItem() == CREATE_CHALLENGE_MATERIAL) {
+      if (registeredMod.getDisplayItem() == CREATE_CHALLENGE_MATERIAL) {
         getLogger().warn("{} is not allowed for modifiers!", CREATE_CHALLENGE_MATERIAL);
         continue;
       }

@@ -1,8 +1,12 @@
-package at.iljabusch.challengeAPI;
+package at.iljabusch.challengeAPI.Challenges;
 
+import java.io.File;
 import java.util.Iterator;
+
+import at.iljabusch.challengeAPI.ChallengeAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
@@ -31,5 +35,27 @@ public class Utils {
           5L
       );
     }
+  }
+
+
+  static boolean deleteBukkitWorld(World world) {
+    //TODO: actully do this skibedy
+    Bukkit.unloadWorld(world, false);
+
+    File folder = new File(Bukkit.getWorldContainer(), world.getName());
+
+    if (folder.exists()) {
+      File[] files = folder.listFiles();
+      if (files != null) {
+        for (File file : files) {
+          if (file.isDirectory()) {
+          } else {
+            file.delete();
+          }
+        }
+      }
+      return folder.delete();
+    }
+    return true;
   }
 }

@@ -1,9 +1,8 @@
 package at.iljabusch.challengeAPI.commands;
 
-import at.iljabusch.challengeAPI.ChallengeManager;
-import at.iljabusch.challengeAPI.Permissions;
-import at.iljabusch.challengeAPI.menus.ChallengeCreationMenu;
+import at.iljabusch.challengeAPI.Challenges.ChallengeManager;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
+import at.iljabusch.challengeAPI.menus.ChallengeCreationMenu;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -182,7 +181,7 @@ public class ChallengeCmd {
                     .getChallenge()
                     .getRegisteredModifiers()
                     .stream()
-                    .map(RegisteredModifier::name)
+                    .map(RegisteredModifier::getName)
                     .toList()
             )
         ),
