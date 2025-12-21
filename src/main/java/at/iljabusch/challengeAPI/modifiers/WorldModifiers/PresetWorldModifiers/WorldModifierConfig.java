@@ -312,4 +312,8 @@ public class WorldModifierConfig {
         };
     }
 
+    public <T> WorldModifierConfig addGamerule(GameRule<T> rule, T value) {
+        gameRules.put(rule, value);
+        return this;
+    }
 }
