@@ -40,69 +40,64 @@ public class WorldModifierConfig {
 
 
     /**
-     * Returns a preconfigured WorldModfierConfig Based on the preset
+     * Returns a preconfigured WorldModfierConfigBuilder Based on the preset for you to configure
      * Use this if you want to change additional Settings otherwise use:
      * RegisteredConfiguredWorldModifier.getPresetConfiguredWorldModifier(WorldModifierPresets preset)
      *
      * @param preset The preset Type
      * @return returns WorldModifierConfig
      */
-    public static WorldModifierConfig getPresetWorldModifierConfig(WorldModifierPresets preset) {
+    public static WorldModifierConfigBuilder getPresetWorldModifierConfig(WorldModifierPresets preset) {
         switch (preset) {
             case OVERWORLD -> {
-                return WorldModifierConfig.builder().build();
+                return WorldModifierConfig.builder();
             }
             case NETHER -> {
                 return WorldModifierConfig.builder()
-                        .environment(World.Environment.NETHER)
-                        .build();
+                        .environment(World.Environment.NETHER);
             }
             case END -> {
                 return WorldModifierConfig.builder()
-                        .environment(World.Environment.THE_END)
-                        .build();
+                        .environment(World.Environment.THE_END);
             }
             case SUPERFLAT_DEFAULT, SUPERFLAT_TUNNELERS_DREAM, SUPERFLAT_WATER_WORLD,
                  SUPERFLAT_OVERWORLD, SUPERFLAT_SNOWY_KINGDOM, SUPERFLAT_BOTTOMLESS_PIT, SUPERFLAT_DESERT,
                  SUPERFLAT_REDSTONE_READY, SUPERFLAT_THE_VOID -> {
                 return WorldModifierConfig.builder()
                         .worldType(WorldType.FLAT)
-                        .generatorSettingsString(getDefaultGeneratorSettings(preset))
-                        .build();
+                        .generatorSettingsString(getDefaultGeneratorSettings(preset));
             }
             case LARGE_BIOMES -> {
                 return WorldModifierConfig.builder()
-                        .worldType(WorldType.LARGE_BIOMES)
-                        .build();
+                        .worldType(WorldType.LARGE_BIOMES);
             }
             case AMPLIFIED -> {
                 return WorldModifierConfig.builder()
-                        .worldType(WorldType.AMPLIFIED)
-                        .build();
+                        .worldType(WorldType.AMPLIFIED);
             }
             case SINGLE_BIOME -> {
                 // TODO: create SingleBiome ChunkGenerator
-                return WorldModifierConfig.builder().build();
+                return WorldModifierConfig.builder();
             }
             case SKY_BLOCK_OVERWORLD -> {
                 // TODO: create SkyBlockOverworld ChunkGenerator
-                return WorldModifierConfig.builder().build();
+                return WorldModifierConfig.builder();
             }
             case SKY_BLOCK_NETHER -> {
                 // TODO: create SkyBlockNether ChunkGenerator
-                return WorldModifierConfig.builder().build();
+                return WorldModifierConfig.builder();
             }
             case SKY_BLOCK_END -> {
                 // TODO: create SkyBlockEnd ChunkGenerator
-                return WorldModifierConfig.builder().build();
+                return WorldModifierConfig.builder();
             }
             case TRUE_VOID -> {
                 // TODO: create TrueVoid ChunkGenerator
-                return WorldModifierConfig.builder().build();
+                return WorldModifierConfig.builder();
             }
             case TRUE_TRUE_VOID -> {
                 // TODO: create TrueTrueVoid ChunkGenerator
-                return WorldModifierConfig.builder().build();
+                return WorldModifierConfig.builder();
             }
             default -> throw new IllegalArgumentException("Unknown Preset " + preset.name());
         }
