@@ -5,12 +5,8 @@ import lombok.Getter;
 import org.bukkit.entity.Player;
 
 @Getter
-public class ChallengePlayerLeaveEvent extends ChallengeEvent {
-  private final Player player;
-
+public class ChallengePlayerLeaveEvent extends ChallengePlayerEvent {
   public ChallengePlayerLeaveEvent(Challenge challenge, Player player) {
-    super(challenge);
-    this.player = player;
+    super(challenge, player);
   }
-
 }

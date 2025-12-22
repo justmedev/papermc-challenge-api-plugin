@@ -40,7 +40,7 @@ public class EventEmitter {
    * @param plugin   Plugin to register
    */
   public void registerEvent(@NotNull Class<? extends Event> event, @NotNull EventExecutor executor, @NotNull Plugin plugin) {
-    challengeProxyEventExecutors.add(new ChallengeProxyEventExecutor(event, challenge, plugin, null, executor));
+    challengeProxyEventExecutors.add(new ChallengeProxyEventExecutor(event, challenge, plugin, EventPriority.NORMAL, executor));
   }
 
   /**

@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,14 +27,13 @@ public class ChallengeProxyEventExecutor implements EventExecutor, Listener {
   private final Plugin plugin;
   private final ChallengeEventExecutorProxyInfo executorInfo;
   private final Map<Class<? extends Event>, List<Method>> registeredMethods = new HashMap<>();
-  private boolean useExecutor = false;
 
   public ChallengeProxyEventExecutor(Challenge challenge, Plugin plugin, Listener userListener) {
     this.challenge = challenge;
     this.plugin = plugin;
     this.userEventListener = userListener;
-    this.useExecutor = false;
     this.executorInfo = null;
+    registerUserListener();
   }
 
   public ChallengeProxyEventExecutor(Class<? extends Event> event, Challenge challenge, Plugin plugin, Listener userListener, EventPriority priority, EventExecutor executor) {
@@ -54,11 +54,37 @@ public class ChallengeProxyEventExecutor implements EventExecutor, Listener {
         priority,
         ignoreCancelled
     );
-    this.useExecutor = true;
+    registerExecutor();
+  }
+  private void registerExecutor(){
+    pluginmanager.registerEvent(
+        executorInfo.event(),
+        this,
+        executorInfo.eventPriority(),
+        this,
+        plugin,
+        executorInfo.ignoreCancelled()
+    );
+  }
+  private void registerUserListener(){
+    addUserListenerMethods();
+
+    for (Class<? extends Event> event : registeredMethods.keySet()) {
+      for (Method method : registeredMethods.get(event)) {
+        EventHandler eh = method.getAnnotation(EventHandler.class);
+        pluginmanager.registerEvent(
+            event,
+            this,
+            eh.priority(),
+            this,
+            plugin,
+            eh.ignoreCancelled()
+        );
+      }
+    }
   }
 
-
-  private void scanListener() {
+  private void addUserListenerMethods() {
     for (Method method : userEventListener.getClass().getMethods()) {
       EventHandler eh = method.getAnnotation(EventHandler.class);
       if (eh != null && method.getParameterTypes().length == 1) {
@@ -75,44 +101,16 @@ public class ChallengeProxyEventExecutor implements EventExecutor, Listener {
     }
   }
 
-  private void registerProxy() {
-    if (useExecutor) {
-      pluginmanager.registerEvent(
-          executorInfo.event(),
-          this,
-          executorInfo.eventPriority(),
-          this,
-          plugin,
-          executorInfo.ignoreCancelled()
-      );
-    } else {
-      for (Class<? extends Event> event : registeredMethods.keySet()) {
-        for (Method method : registeredMethods.get(event)) {
-          EventHandler eh = method.getAnnotation(EventHandler.class);
-          pluginmanager.registerEvent(
-              event,
-              this,
-              eh.priority(),
-              this,
-              plugin,
-              eh.ignoreCancelled()
-          );
-        }
-      }
-    }
-  }
-
   @Override
   public void execute(@NotNull Listener listener, @NotNull Event event) throws EventException {
     if (!isEventAffiliated(event)) return;
 
-    if (!registeredMethods.containsKey(event.getClass())) return;
 
-    if (useExecutor) {
-      if (userEventListener == null) return;
-
+    if (executorInfo != null) {
       executorInfo.executor().execute(listener, event);
     }
+
+    if (!registeredMethods.containsKey(event.getClass())) return;
 
     for (Method method : registeredMethods.get(event.getClass())) {
       method.setAccessible(true);
@@ -122,9 +120,13 @@ public class ChallengeProxyEventExecutor implements EventExecutor, Listener {
         throw new RuntimeException(e);
       }
     }
+
   }
 
   private boolean isEventAffiliated(@NotNull Event event) {
+    if(event instanceof ChallengeEvent){
+      if(((ChallengeEvent) event).getChallenge().equals(challenge))return true;
+    }
     if (event instanceof PlayerEvent) {
       if (challenge.getPlayerUUIDs().contains(((PlayerEvent) event).getPlayer().getUniqueId())) return true;
     }
