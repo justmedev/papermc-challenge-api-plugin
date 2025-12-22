@@ -1,13 +1,12 @@
 package at.iljabusch.challengeAPI.modifiers.stopwatch;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
-import at.iljabusch.challengeAPI.Challenges.Challenge;
-import at.iljabusch.challengeAPI.Challenges.ChallengeEvents.ChallengeStartedEvent;
+import at.iljabusch.challengeAPI.challenges.Challenge;
+import at.iljabusch.challengeAPI.challenges.events.ChallengeStartedEvent;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;

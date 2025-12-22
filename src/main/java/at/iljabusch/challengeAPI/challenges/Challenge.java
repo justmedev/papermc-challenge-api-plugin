@@ -1,23 +1,12 @@
-package at.iljabusch.challengeAPI.Challenges;
-
-import static org.apache.logging.log4j.LogManager.getLogger;
+package at.iljabusch.challengeAPI.challenges;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
-import at.iljabusch.challengeAPI.Challenges.ChallengeEvents.ChallengePlayerJoinEvent;
-import at.iljabusch.challengeAPI.Challenges.ChallengeEvents.ChallengePlayerLeaveEvent;
-import at.iljabusch.challengeAPI.Challenges.ChallengeEvents.ChallengeProxyEventExecutor;
-import at.iljabusch.challengeAPI.Challenges.ChallengeEvents.ChallengeStartedEvent;
-import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
+import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerJoinEvent;
+import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerLeaveEvent;
+import at.iljabusch.challengeAPI.challenges.events.ChallengeProxyEventExecutor;
+import at.iljabusch.challengeAPI.challenges.events.ChallengeStartedEvent;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
+import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
@@ -41,7 +30,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.core.MultiverseCoreApi;
 
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 @Getter
 public class Challenge {

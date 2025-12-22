@@ -1,4 +1,4 @@
-package at.iljabusch.challengeAPI.modifiers.WorldModifiers.PresetWorldModifiers;
+package at.iljabusch.challengeAPI.modifiers.world.presets;
 
 import lombok.Builder;
 import org.bukkit.*;

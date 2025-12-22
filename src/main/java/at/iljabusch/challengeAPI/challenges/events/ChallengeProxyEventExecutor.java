@@ -1,6 +1,6 @@
-package at.iljabusch.challengeAPI.Challenges.ChallengeEvents;
+package at.iljabusch.challengeAPI.challenges.events;
 
-import at.iljabusch.challengeAPI.Challenges.Challenge;
+import at.iljabusch.challengeAPI.challenges.Challenge;
 import org.bukkit.Bukkit;
 import org.bukkit.event.*;
 import org.bukkit.event.block.BlockEvent;

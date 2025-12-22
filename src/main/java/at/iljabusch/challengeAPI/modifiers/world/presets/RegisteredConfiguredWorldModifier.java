@@ -1,19 +1,16 @@
-package at.iljabusch.challengeAPI.modifiers.WorldModifiers.PresetWorldModifiers;
+package at.iljabusch.challengeAPI.modifiers.world.presets;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
-import at.iljabusch.challengeAPI.Challenges.Challenge;
-import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
+import at.iljabusch.challengeAPI.challenges.Challenge;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
-import lombok.Builder;
+import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.generator.ChunkGenerator;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.stream.Collectors;
 
 @Data

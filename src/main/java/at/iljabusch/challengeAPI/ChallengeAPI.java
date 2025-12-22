@@ -1,13 +1,13 @@
 package at.iljabusch.challengeAPI;
 
-import at.iljabusch.challengeAPI.Challenges.ChallengeManager;
+import at.iljabusch.challengeAPI.challenges.ChallengeManager;
 import at.iljabusch.challengeAPI.commands.ChallengeCmd;
 import at.iljabusch.challengeAPI.menus.ChallengeCreationMenuListener;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
-import at.iljabusch.challengeAPI.modifiers.WorldModifiers.PresetWorldModifiers.WorldModifierConfig;
-import at.iljabusch.challengeAPI.modifiers.WorldModifiers.PresetWorldModifiers.WorldModifierPresets;
 import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
 import at.iljabusch.challengeAPI.modifiers.stopwatch.StopwatchModifier;
+import at.iljabusch.challengeAPI.modifiers.world.presets.RegisteredConfiguredWorldModifier;
+import at.iljabusch.challengeAPI.modifiers.world.presets.WorldModifierPresets;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -47,8 +47,8 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
 
 
     ChallengeManager.getInstance().registerModifier(
-            WorldModifierConfig.getPresetWorldModifierConfig(WorldModifierPresets.SUPERFLAT_DESERT)
-    )
+            RegisteredConfiguredWorldModifier.getPresetConfiguredWorldModifier(WorldModifierPresets.SUPERFLAT_DESERT)
+    );
 
     getLifecycleManager().registerEventHandler(
         LifecycleEvents.COMMANDS, commands -> {

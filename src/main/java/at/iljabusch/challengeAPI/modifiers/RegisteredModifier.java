@@ -1,6 +1,6 @@
 package at.iljabusch.challengeAPI.modifiers;
 
-import at.iljabusch.challengeAPI.Challenges.Challenge;
+import at.iljabusch.challengeAPI.challenges.Challenge;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

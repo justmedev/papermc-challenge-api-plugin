@@ -1,8 +1,8 @@
 package at.iljabusch.challengeAPI.commands;
 
-import at.iljabusch.challengeAPI.Challenges.ChallengeManager;
-import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
+import at.iljabusch.challengeAPI.challenges.ChallengeManager;
 import at.iljabusch.challengeAPI.menus.ChallengeCreationMenu;
+import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

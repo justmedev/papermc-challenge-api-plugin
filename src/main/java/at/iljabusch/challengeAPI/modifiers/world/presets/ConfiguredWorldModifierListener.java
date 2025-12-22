@@ -1,8 +1,8 @@
-package at.iljabusch.challengeAPI.modifiers.WorldModifiers.PresetWorldModifiers;
+package at.iljabusch.challengeAPI.modifiers.world.presets;
 
-import at.iljabusch.challengeAPI.Challenges.Challenge;
-import at.iljabusch.challengeAPI.Challenges.ChallengeEvents.ChallengeCreatedEvent;
-import at.iljabusch.challengeAPI.Challenges.ChallengeEvents.ChallengeWorldCreatedEvent;
+import at.iljabusch.challengeAPI.challenges.Challenge;
+import at.iljabusch.challengeAPI.challenges.events.ChallengeCreatedEvent;
+import at.iljabusch.challengeAPI.challenges.events.ChallengeWorldCreatedEvent;
 import org.bukkit.WorldCreator;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

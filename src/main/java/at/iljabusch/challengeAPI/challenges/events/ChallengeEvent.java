@@ -1,6 +1,6 @@
-package at.iljabusch.challengeAPI.Challenges.ChallengeEvents;
+package at.iljabusch.challengeAPI.challenges.events;
 
-import at.iljabusch.challengeAPI.Challenges.Challenge;
+import at.iljabusch.challengeAPI.challenges.Challenge;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;

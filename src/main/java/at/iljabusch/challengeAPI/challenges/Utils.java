@@ -1,7 +1,4 @@
-package at.iljabusch.challengeAPI.Challenges;
-
-import java.io.File;
-import java.util.Iterator;
+package at.iljabusch.challengeAPI.challenges;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
 import org.bukkit.Bukkit;
@@ -11,6 +8,9 @@ import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.util.Iterator;
 
 public class Utils {
 

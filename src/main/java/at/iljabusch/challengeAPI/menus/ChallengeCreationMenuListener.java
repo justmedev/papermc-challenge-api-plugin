@@ -1,14 +1,15 @@
 package at.iljabusch.challengeAPI.menus;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
-import java.util.HashSet;
-
-import at.iljabusch.challengeAPI.Challenges.Challenge;
-import at.iljabusch.challengeAPI.Challenges.ChallengeManager;
+import at.iljabusch.challengeAPI.challenges.Challenge;
+import at.iljabusch.challengeAPI.challenges.ChallengeManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+
+import java.util.HashSet;
+
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 public class ChallengeCreationMenuListener implements Listener {
 

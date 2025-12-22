@@ -1,21 +1,17 @@
-package at.iljabusch.challengeAPI.Challenges;
-
-import static org.apache.logging.log4j.LogManager.getLogger;
+package at.iljabusch.challengeAPI.challenges;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
-import at.iljabusch.challengeAPI.Challenges.ChallengeEvents.PlayerInChallenge;
+import at.iljabusch.challengeAPI.challenges.events.PlayerInChallenge;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
 import lombok.Getter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.*;
+
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 @Getter
 public class ChallengeManager {

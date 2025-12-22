@@ -1,10 +1,8 @@
-package at.iljabusch.challengeAPI.modifiers.WorldModifiers.PresetWorldModifiers;
+package at.iljabusch.challengeAPI.modifiers.world.presets;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
-import at.iljabusch.challengeAPI.Challenges.Challenge;
+import at.iljabusch.challengeAPI.challenges.Challenge;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
-import lombok.NoArgsConstructor;
-import org.bukkit.Bukkit;
 
 
 public class ConfiguredWorldModifier extends Modifier {

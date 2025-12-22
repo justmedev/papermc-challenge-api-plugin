@@ -1,6 +1,6 @@
-package at.iljabusch.challengeAPI.Challenges.ChallengeEvents;
+package at.iljabusch.challengeAPI.challenges.events;
 
-import at.iljabusch.challengeAPI.Challenges.Challenge;
+import at.iljabusch.challengeAPI.challenges.Challenge;
 
 public class ChallengeCreatedEvent extends ChallengeEvent {
     public ChallengeCreatedEvent(Challenge challenge) {

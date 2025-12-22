@@ -1,4 +1,4 @@
-package at.iljabusch.challengeAPI.Challenges;
+package at.iljabusch.challengeAPI.challenges;
 
 public enum ChallengeState {
   PREPARING,

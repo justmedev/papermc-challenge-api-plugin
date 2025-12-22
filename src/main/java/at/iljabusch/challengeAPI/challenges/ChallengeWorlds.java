@@ -1,10 +1,9 @@
-package at.iljabusch.challengeAPI.Challenges;
+package at.iljabusch.challengeAPI.challenges;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bukkit.World;
-import org.mvplugins.multiverse.core.world.MultiverseWorld;
 
 @Setter
 @AllArgsConstructor
