@@ -58,7 +58,7 @@ public class ChallengeCreationMenu implements InventoryHolder {
     this.inventory.setItem(8, createGuiItem(CREATE_CHALLENGE_MATERIAL, "Create challenge"));
   }
 
-  public static ItemStack createGuiItem(Material material, String name, final Component... lore) {
+  public static @NonNull ItemStack createGuiItem(@NonNull Material material, @NonNull String name, final Component... lore) {
     final var item = new ItemStack(material, 1);
     final var meta = item.getItemMeta();
 

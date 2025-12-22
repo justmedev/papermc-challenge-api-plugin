@@ -21,6 +21,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -37,7 +39,7 @@ public class Challenge {
 
   private final LocalDateTime startedAt = LocalDateTime.now();
   private final ArrayList<UUID> playerUUIDs = new ArrayList<>();
-  private final UUID creatorUUID;
+  private final @NonNull UUID creatorUUID;
   private final ChallengeWorlds worlds = new ChallengeWorlds();
   private final UUID worldUUID = UUID.randomUUID();
   private final PluginManager pluginManager = plugin.getServer().getPluginManager();
@@ -49,9 +51,9 @@ public class Challenge {
   @Setter
   private Set<RegisteredModifier> registeredModifiers;
   @Setter
-  private Set<Modifier> modifiers = new HashSet<>();
+  private @NonNull Set<Modifier> modifiers = new HashSet<>();
 
-  public Challenge(Player creator, Set<RegisteredModifier> options) {
+  public Challenge(@NonNull Player creator, Set<RegisteredModifier> options) {
     creator.sendRichMessage("<gold>Creating challenge ...");
     this.registeredModifiers = options;
 
@@ -113,7 +115,7 @@ public class Challenge {
     );
   }
 
-  public AtomicReference<WorldCreator> setWorldCreator(WorldCreator creator) {
+  public @Nullable AtomicReference<WorldCreator> setWorldCreator(@NonNull WorldCreator creator) {
     switch (creator.environment()) {
       case NETHER:
         if (setSingleWorldCreator(overworldCreator, creator)) {
@@ -132,7 +134,7 @@ public class Challenge {
     return null;
   }
 
-  private boolean setSingleWorldCreator(AtomicReference<WorldCreator> ref, WorldCreator creator) {
+  private boolean setSingleWorldCreator(@NonNull AtomicReference<WorldCreator> ref, @NonNull WorldCreator creator) {
     if (ref.get() != null) {
       getLogger().warn("Duplicate WorldMoifiers!\nCannot assign WorldModifier " + creator.environment().name() + " was already set!");
       return false;
@@ -144,11 +146,11 @@ public class Challenge {
     return success;
   }
 
-  private Optional<Player> getCreator() {
+  private @NonNull Optional<Player> getCreator() {
     return getOnlinePlayers().stream().filter(p -> p.getUniqueId() == creatorUUID).findFirst();
   }
 
-  public List<Player> getOnlinePlayers() {
+  public @NonNull List<Player> getOnlinePlayers() {
     return playerUUIDs.stream()
                       .map(p -> Bukkit.getServer().getPlayer(p))
                       .filter(Objects::nonNull)
@@ -214,7 +216,7 @@ public class Challenge {
     });
   }
 
-  public void join(Player player) {
+  public void join(@NonNull Player player) {
     if (!this.playerUUIDs.contains(player.getUniqueId())) {
       this.playerUUIDs.add(player.getUniqueId());
     }
@@ -229,7 +231,7 @@ public class Challenge {
     player.sendRichMessage("<gold>Challenge rejoined!");
   }
 
-  public void leave(Player player) {
+  public void leave(@NonNull Player player) {
     if (playerUUIDs.remove(player.getUniqueId()) && state.isOngoingOrCompleted()) {
       player.teleportAsync(Bukkit.getWorld("world").getSpawnLocation()); // TODO: dynamic default world name
     }

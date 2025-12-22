@@ -7,6 +7,8 @@ import org.bukkit.block.Biome;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 
@@ -16,9 +18,9 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 public class WorldModifierConfig {
 
   @Builder.Default
-  protected HashMap<GameRule, Object> gameRules = new HashMap<>();
+  protected @NonNull HashMap<GameRule, Object> gameRules = new HashMap<>();
   @Builder.Default
-  protected Biome singleBiomeWorldBiome = null;
+  protected @Nullable Biome singleBiomeWorldBiome = null;
   @Builder.Default
   protected boolean generateStructures = true;
   @Builder.Default
@@ -32,9 +34,9 @@ public class WorldModifierConfig {
   protected World.Environment environment = World.Environment.NORMAL;
   protected Difficulty difficulty;
   @Builder.Default
-  protected Boolean allowMonsterSpawning = true;
+  protected @NonNull Boolean allowMonsterSpawning = true;
   @Builder.Default
-  protected Boolean allowAnimalSpawning = true;
+  protected @NonNull Boolean allowAnimalSpawning = true;
   @Builder.Default
   protected int clearWeatherDurationTicks = 0;
   protected Vector spawnLocation;
@@ -49,7 +51,7 @@ public class WorldModifierConfig {
    * @param preset The preset Type
    * @return returns WorldModifierConfig
    */
-  public static WorldModifierConfigBuilder getPresetWorldModifierConfig(WorldModifierPresets preset) {
+  public static WorldModifierConfigBuilder getPresetWorldModifierConfig(@NonNull WorldModifierPresets preset) {
     switch (preset) {
       case OVERWORLD, SINGLE_BIOME -> {
         return WorldModifierConfig.builder();
@@ -108,7 +110,7 @@ public class WorldModifierConfig {
    * @return JSON string with default generator settings
    */
   //[ChatGPT]\\
-  public static String getDefaultGeneratorSettings(WorldModifierPresets preset) {
+  public static @NonNull String getDefaultGeneratorSettings(@NonNull WorldModifierPresets preset) {
     return switch (preset) {
       case SUPERFLAT_DEFAULT -> """
           {
@@ -304,19 +306,19 @@ public class WorldModifierConfig {
     };
   }
 
-  public static WorldModifierConfigBuilder fromPlugin(Plugin plugin) {
+  public static WorldModifierConfigBuilder fromPlugin(@NonNull Plugin plugin) {
     return fromPlugin(plugin, ChallengeAPI.DEFAULT_MATERIAL);
   }
 
-  public static WorldModifierConfigBuilder fromPlugin(String name) {
+  public static @Nullable WorldModifierConfigBuilder fromPlugin(@NonNull String name) {
     return fromPlugin(name, ChallengeAPI.DEFAULT_MATERIAL, "world", null);
   }
 
-  public static WorldModifierConfigBuilder fromPlugin(String name, Material material) {
+  public static @Nullable WorldModifierConfigBuilder fromPlugin(@NonNull String name, Material material) {
     return fromPlugin(name, material, "world", null);
   }
 
-  public static WorldModifierConfigBuilder fromPlugin(String name, Material material, String worldName, String generatorId) {
+  public static @Nullable WorldModifierConfigBuilder fromPlugin(@NonNull String name, Material material, @NonNull String worldName, String generatorId) {
     Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
     if (plugin == null) {
       getLogger().warn("Plugin '{}' not found! Could not register!", name);
@@ -325,11 +327,11 @@ public class WorldModifierConfig {
     return fromPlugin(plugin, material, worldName, generatorId);
   }
 
-  public static WorldModifierConfigBuilder fromPlugin(Plugin plugin, Material material) {
+  public static @Nullable WorldModifierConfigBuilder fromPlugin(@NonNull Plugin plugin, Material material) {
     return fromPlugin(plugin, material, "world", null);
   }
 
-  public static WorldModifierConfigBuilder fromPlugin(Plugin plugin, Material material, String worldName, String generatorId) {
+  public static @Nullable WorldModifierConfigBuilder fromPlugin(@NonNull Plugin plugin, Material material, @NonNull String worldName, String generatorId) {
     try {
       plugin.getClass().getMethod("getDefaultWorldGenerator", String.class, String.class);
     } catch (NoSuchMethodException e) {
@@ -340,7 +342,7 @@ public class WorldModifierConfig {
   }
 
   public static class WorldModifierConfigBuilder {
-    public WorldModifierConfigBuilder addGamerule(GameRule<?> rule, Object value) {
+    public @NonNull WorldModifierConfigBuilder addGamerule(GameRule<?> rule, Object value) {
       this.gameRules$value.put(rule, value);
       return this;
     }

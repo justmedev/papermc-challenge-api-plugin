@@ -38,7 +38,7 @@ public class Utils {
     }
   }
 
-  static boolean deleteBukkitWorld(World world) {
+  static boolean deleteBukkitWorld(@NonNull World world) {
     Bukkit.unloadWorld(world, false);
 
     var folder = new File(Bukkit.getWorldContainer(), world.getName());

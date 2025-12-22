@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.stream.Collectors;
@@ -31,19 +33,19 @@ public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
 
 
   //TODO: add these to WorldModifierConfig but returning a builder so the use can gor registerModifier(fromPlugin(plugin).envrionment().addGamerule() ...
-  public static RegisteredConfiguredWorldModifier fromPlugin(Plugin plugin) {
+  public static RegisteredConfiguredWorldModifier fromPlugin(@NonNull Plugin plugin) {
     return fromPlugin(plugin, ChallengeAPI.DEFAULT_MATERIAL);
   }
 
-  public static RegisteredConfiguredWorldModifier fromPlugin(String name) {
+  public static @Nullable RegisteredConfiguredWorldModifier fromPlugin(@NonNull String name) {
     return fromPlugin(name, ChallengeAPI.DEFAULT_MATERIAL, "world", null);
   }
 
-  public static RegisteredConfiguredWorldModifier fromPlugin(String name, Material material) {
+  public static @Nullable RegisteredConfiguredWorldModifier fromPlugin(@NonNull String name, Material material) {
     return fromPlugin(name, material, "world", null);
   }
 
-  public static RegisteredConfiguredWorldModifier fromPlugin(String name, Material material, String worldName, String generatorId) {
+  public static @Nullable RegisteredConfiguredWorldModifier fromPlugin(@NonNull String name, Material material, @NonNull String worldName, String generatorId) {
     Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
     if (plugin == null) {
       getLogger().warn("Plugin '{}' not found! Could not register!", name);
@@ -52,11 +54,11 @@ public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
     return fromPlugin(plugin, material, worldName, generatorId);
   }
 
-  public static RegisteredConfiguredWorldModifier fromPlugin(Plugin plugin, Material material) {
+  public static @Nullable RegisteredConfiguredWorldModifier fromPlugin(@NonNull Plugin plugin, Material material) {
     return fromPlugin(plugin, material, "world", null);
   }
 
-  public static RegisteredConfiguredWorldModifier fromPlugin(Plugin plugin, Material material, String worldName, String generatorId) {
+  public static @Nullable RegisteredConfiguredWorldModifier fromPlugin(@NonNull Plugin plugin, Material material, @NonNull String worldName, String generatorId) {
     try {
       plugin.getClass().getMethod("getDefaultWorldGenerator", String.class, String.class);
     } catch (NoSuchMethodException e) {
@@ -81,7 +83,7 @@ public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
     return registeredMod;
   }
 
-  public static <T extends ChunkGenerator> RegisteredConfiguredWorldModifier fromGenerator(T generator, Material material) {
+  public static <T extends ChunkGenerator> @NonNull RegisteredConfiguredWorldModifier fromGenerator(@NonNull T generator, Material material) {
     RegisteredConfiguredWorldModifier registeredMod = new RegisteredConfiguredWorldModifier();
     registeredMod.setName(generator.getClass().getSimpleName());
     registeredMod.setAuthor("Unknown");
@@ -92,7 +94,7 @@ public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
     return registeredMod;
   }
 
-  public static RegisteredConfiguredWorldModifier getPresetConfiguredWorldModifier(WorldModifierPresets preset) {
+  public static @NonNull RegisteredConfiguredWorldModifier getPresetConfiguredWorldModifier(@NonNull WorldModifierPresets preset) {
     RegisteredConfiguredWorldModifier registeredMod = new RegisteredConfiguredWorldModifier();
     registeredMod.setName(preset.getDisplayName());
     registeredMod.setAuthor("Challenge API");
@@ -103,7 +105,7 @@ public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
   }
 
   @Override
-  public Modifier createModifierInstance(Challenge challenge) {
+  public @Nullable Modifier createModifierInstance(@NonNull Challenge challenge) {
     try {
       if (this.getModifier().isInstance(ConfiguredWorldModifier.class)) {
         return this.getModifier().getDeclaredConstructor(Challenge.class, WorldModifierConfig.class).newInstance(challenge, config);
