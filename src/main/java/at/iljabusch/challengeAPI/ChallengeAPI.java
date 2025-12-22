@@ -1,7 +1,7 @@
 package at.iljabusch.challengeAPI;
 
 import at.iljabusch.challengeAPI.commands.ChallengeCmd;
-import at.iljabusch.challengeAPI.menus.ChallengeCreationMenuListener;
+import at.iljabusch.challengeAPI.menus.createchallenge.ChallengeCreationMenuListener;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
 import at.iljabusch.challengeAPI.modifiers.stopwatch.StopwatchModifier;
@@ -32,14 +32,16 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
             SharedHealthModifier.class
         )
     );
-    ChallengeManager.getInstance().registerModifier(
-        new RegisteredModifier(
-            "Stopwatch",
-            "Ilja Busch",
-            Material.CLOCK,
-            StopwatchModifier.class
-        )
-    );
+    for (int i = 0; i < 7 * 6 + 4; i++) {
+      ChallengeManager.getInstance().registerModifier(
+          new RegisteredModifier(
+              "Stopwatch",
+              "Ilja Busch",
+              Material.CLOCK,
+              StopwatchModifier.class
+          )
+      );
+    }
 
     getLifecycleManager().registerEventHandler(
         LifecycleEvents.COMMANDS, commands -> {
