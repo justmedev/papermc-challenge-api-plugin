@@ -6,6 +6,7 @@ import at.iljabusch.challengeAPI.modifiers.world.presets.chunk_generators.Single
 import org.bukkit.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.jspecify.annotations.NonNull;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -18,7 +19,7 @@ public class ConfiguredWorldModifierListener implements Listener {
   }
 
   @EventHandler
-  public void onChallengeCreated(ChallengeCreatedEvent event) {
+  public void onChallengeCreated(@NonNull ChallengeCreatedEvent event) {
     WorldCreator configuredWorldCreator = new WorldCreator("temp");
     configuredWorldCreator.type(config.worldType);
     if (config.singleBiomeWorldBiome != null) {
@@ -38,7 +39,7 @@ public class ConfiguredWorldModifierListener implements Listener {
   }
 
   @EventHandler
-  public void onChallengeWorldCreated(ChallengeWorldCreatedEvent event) {
+  public void onChallengeWorldCreated(@NonNull ChallengeWorldCreatedEvent event) {
     if (worldCreator == null) return;
     World world = event.getWorld();
 

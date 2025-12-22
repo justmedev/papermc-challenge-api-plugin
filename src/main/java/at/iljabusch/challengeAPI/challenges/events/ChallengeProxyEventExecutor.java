@@ -12,6 +12,7 @@ import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,7 +25,7 @@ public class ChallengeProxyEventExecutor implements EventExecutor, Listener {
   private final Listener userEventListener;
   private final PluginManager pluginmanager = Bukkit.getPluginManager();
   private final Plugin plugin;
-  private final ChallengeEventExecutorProxyInfo executorInfo;
+  private final @Nullable ChallengeEventExecutorProxyInfo executorInfo;
   private final Map<Class<? extends Event>, List<Method>> registeredMethods = new HashMap<>();
 
   public ChallengeProxyEventExecutor(Challenge challenge, Plugin plugin, Listener userListener) {

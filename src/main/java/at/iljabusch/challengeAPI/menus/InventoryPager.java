@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -127,7 +128,7 @@ public class InventoryPager<ITEM extends InventoryItem> {
    *
    * @param allItems map of an inventory layout, larger than the actual inventory
    */
-  public void autoPage(HashMap<Integer, ITEM> allItems) {
+  public void autoPage(@NonNull HashMap<Integer, ITEM> allItems) {
     var maxIndexPerPage = (pagedSectionCols * pagedSectionRows) - 1;
     // TODO: This implementation does not account for empty slots in between
     allItems.forEach((index, item) -> {

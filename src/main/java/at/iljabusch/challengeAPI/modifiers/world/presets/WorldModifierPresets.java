@@ -1,6 +1,7 @@
 package at.iljabusch.challengeAPI.modifiers.world.presets;
 
 import org.bukkit.Material;
+import org.jspecify.annotations.NonNull;
 
 public enum WorldModifierPresets {
   OVERWORLD,
@@ -33,7 +34,7 @@ public enum WorldModifierPresets {
   SKY_BLOCK_NETHER,
   SKY_BLOCK_END;
 
-  public String getDisplayName() {
+  public @NonNull String getDisplayName() {
     return switch (this) {
       case OVERWORLD -> "Overworld";
       case NETHER -> "Nether";
@@ -58,7 +59,7 @@ public enum WorldModifierPresets {
     };
   }
 
-  public Material getPresetDefaultMaterial() {
+  public @NonNull Material getPresetDefaultMaterial() {
     return switch (this) {
       case OVERWORLD -> Material.GRASS_BLOCK;
       case NETHER -> Material.NETHERRACK;

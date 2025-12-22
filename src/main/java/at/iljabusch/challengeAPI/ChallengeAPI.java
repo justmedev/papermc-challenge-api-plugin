@@ -16,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jspecify.annotations.NonNull;
 
 public final class ChallengeAPI extends JavaPlugin implements Listener {
 
@@ -57,7 +58,7 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
   }
 
   @EventHandler
-  public void onPlayerJoin(PlayerJoinEvent event) {
+  public void onPlayerJoin(@NonNull PlayerJoinEvent event) {
     getLogger().info("%s joined!".formatted(event.getPlayer().getUniqueId()));
     var player = state.getPlayersInChallenges().get(event.getPlayer().getUniqueId());
     if (player == null) {
@@ -69,7 +70,7 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
   }
 
   @EventHandler
-  public void onPlayerLeave(PlayerQuitEvent event) {
+  public void onPlayerLeave(@NonNull PlayerQuitEvent event) {
     var player = state.getPlayersInChallenges().get(event.getPlayer().getUniqueId());
     if (player == null) {
       return;

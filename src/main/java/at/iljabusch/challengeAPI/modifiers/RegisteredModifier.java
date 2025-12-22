@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bukkit.Material;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -20,7 +22,7 @@ public class RegisteredModifier {
   Class<? extends Modifier> modifier;
 
 
-  public Modifier createModifierInstance(Challenge challenge) {
+  public @Nullable Modifier createModifierInstance(@NonNull Challenge challenge) {
     try {
       return modifier.getDeclaredConstructor(Challenge.class).newInstance(challenge);
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {

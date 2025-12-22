@@ -13,6 +13,7 @@ import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.NonNull;
 
 public class ChallengeCmd {
 
@@ -62,7 +63,7 @@ public class ChallengeCmd {
     return rootCmd.build();
   }
 
-  private static int runInviteLogic(CommandContext<CommandSourceStack> ctx)
+  private static int runInviteLogic(@NonNull CommandContext<CommandSourceStack> ctx)
       throws CommandSyntaxException {
     if (!(ctx.getSource().getExecutor() instanceof Player executor)) {
       ctx.getSource().getSender().sendRichMessage(
@@ -95,7 +96,7 @@ public class ChallengeCmd {
   }
 
   // TODO: Multiple invites per person
-  private static int runAcceptInviteLogic(CommandContext<CommandSourceStack> ctx) {
+  private static int runAcceptInviteLogic(@NonNull CommandContext<CommandSourceStack> ctx) {
     var sender = ctx.getSource().getSender();
     if (!(sender instanceof Player) || !(ctx.getSource()
                                             .getExecutor() instanceof Player executor)) {
@@ -107,7 +108,7 @@ public class ChallengeCmd {
     return Command.SINGLE_SUCCESS;
   }
 
-  private static int runCreateLogic(CommandContext<CommandSourceStack> ctx) {
+  private static int runCreateLogic(@NonNull CommandContext<CommandSourceStack> ctx) {
     var sender = ctx.getSource().getSender();
     if (!(sender instanceof Player) || !(ctx.getSource()
                                             .getExecutor() instanceof Player executor)) {
@@ -127,7 +128,7 @@ public class ChallengeCmd {
     return Command.SINGLE_SUCCESS;
   }
 
-  private static int runLeaveChallengeLogic(CommandContext<CommandSourceStack> ctx) {
+  private static int runLeaveChallengeLogic(@NonNull CommandContext<CommandSourceStack> ctx) {
     var sender = ctx.getSource().getSender();
     if (!(sender instanceof Player) || !(ctx.getSource()
                                             .getExecutor() instanceof Player executor)) {
@@ -139,7 +140,7 @@ public class ChallengeCmd {
     return Command.SINGLE_SUCCESS;
   }
 
-  private static int runStartLogic(CommandContext<CommandSourceStack> ctx) {
+  private static int runStartLogic(@NonNull CommandContext<CommandSourceStack> ctx) {
     var sender = ctx.getSource().getSender();
     if (!(sender instanceof Player) || !(ctx.getSource()
                                             .getExecutor() instanceof Player executor)) {
@@ -151,7 +152,7 @@ public class ChallengeCmd {
     return Command.SINGLE_SUCCESS;
   }
 
-  private static int runInfoLogic(CommandContext<CommandSourceStack> ctx) {
+  private static int runInfoLogic(@NonNull CommandContext<CommandSourceStack> ctx) {
     var sender = ctx.getSource().getSender();
     if (!(sender instanceof Player) || !(ctx.getSource()
                                             .getExecutor() instanceof Player executor)) {

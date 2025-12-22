@@ -7,6 +7,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @Getter
 public abstract class ChallengeEvent extends Event implements Cancellable {
@@ -19,7 +20,7 @@ public abstract class ChallengeEvent extends Event implements Cancellable {
     this.challenge = challenge;
   }
 
-  public static HandlerList getHandlerList() {
+  public static @NonNull HandlerList getHandlerList() {
     return handlers;
   }
 

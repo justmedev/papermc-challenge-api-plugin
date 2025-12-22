@@ -29,7 +29,7 @@ public class SharedHealthModifierEventListener implements Listener {
     this.modifier = modifier;
   }
 
-  public boolean isPlayerNotPartOfActiveChallenge(Player player) {
+  public boolean isPlayerNotPartOfActiveChallenge(@NonNull Player player) {
     return !modifier.getChallenge().getPlayerUUIDs().contains(player.getUniqueId())
         || modifier.getChallenge().getState() != ChallengeState.ONGOING;
   }
@@ -65,7 +65,7 @@ public class SharedHealthModifierEventListener implements Listener {
   }
 
   @EventHandler(ignoreCancelled = true)
-  public void onDamage(EntityDamageEvent event) {
+  public void onDamage(@NonNull EntityDamageEvent event) {
     if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
       return;
     }
@@ -83,7 +83,7 @@ public class SharedHealthModifierEventListener implements Listener {
   }
 
   @EventHandler(ignoreCancelled = true)
-  public void onRegen(EntityRegainHealthEvent event) {
+  public void onRegen(@NonNull EntityRegainHealthEvent event) {
     if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
       return;
     }
@@ -95,7 +95,7 @@ public class SharedHealthModifierEventListener implements Listener {
   }
 
   @EventHandler(ignoreCancelled = true)
-  public void onFoodChange(Listener listener, FoodLevelChangeEvent event) {
+  public void onFoodChange(Listener listener, @NonNull FoodLevelChangeEvent event) {
     if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
       return;
     }
@@ -107,7 +107,7 @@ public class SharedHealthModifierEventListener implements Listener {
   }
 
   @EventHandler(ignoreCancelled = true)
-  public void onPotion(EntityPotionEffectEvent event) {
+  public void onPotion(@NonNull EntityPotionEffectEvent event) {
     if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
       return;
     }
@@ -119,7 +119,7 @@ public class SharedHealthModifierEventListener implements Listener {
   }
 
   @EventHandler(ignoreCancelled = true)
-  public void onDragonDeath(EntityDeathEvent event) {
+  public void onDragonDeath(@NonNull EntityDeathEvent event) {
     if (!(event.getEntity() instanceof EnderDragon dragon)) {
       return;
     }
@@ -132,7 +132,7 @@ public class SharedHealthModifierEventListener implements Listener {
   }
 
   @EventHandler
-  public void onPlayerJoin(ChallengePlayerJoinEvent event) {
+  public void onPlayerJoin(@NonNull ChallengePlayerJoinEvent event) {
     var possibleSource = event.getChallenge().getOnlinePlayers().getFirst();
     if (possibleSource.equals(event.getPlayer())) {
       return;
