@@ -21,13 +21,13 @@ public class StopwatchModifier extends Modifier implements Listener {
   public StopwatchModifier(Challenge challenge) {
     super(challenge);
 
-    challenge.registerEvent(
+    challenge.getEventEmitter().registerEvent(
         ChallengeStartedEvent.class,
         (listener, event) -> startTask(),
         JavaPlugin.getPlugin(ChallengeAPI.class)
     );
 
-    challenge.registerEvent(
+    challenge.getEventEmitter().registerEvent(
         ChallengePlayerJoinEvent.class,
         (listener, event) -> {
           if (task.isCancelled()) {
@@ -37,7 +37,7 @@ public class StopwatchModifier extends Modifier implements Listener {
         JavaPlugin.getPlugin(ChallengeAPI.class)
     );
 
-    challenge.registerEvent(
+    challenge.getEventEmitter().registerEvent(
         ChallengePlayerLeaveEvent.class,
         (listener, event) -> {
           if (!challenge.getOnlinePlayers().isEmpty()) {

@@ -3,7 +3,6 @@ package at.iljabusch.challengeAPI.challenges;
 import at.iljabusch.challengeAPI.ChallengeAPI;
 import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerJoinEvent;
 import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerLeaveEvent;
-import at.iljabusch.challengeAPI.challenges.events.ChallengeProxyEventExecutor;
 import at.iljabusch.challengeAPI.challenges.events.ChallengeStartedEvent;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
@@ -18,16 +17,10 @@ import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.EventExecutor;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.jetbrains.annotations.NotNull;
 import org.mvplugins.multiverse.core.MultiverseCoreApi;
 
 import java.time.LocalDateTime;
@@ -39,10 +32,6 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 
 @Getter
 public class Challenge {
-  //TODO: let modfiers add a Listener directly to the challenge to check automtically if an event is associated with
-  // the challeneg or not
-  //TODO: define EventBus in Challenge onChallengeStarted, onWorldLoaded, onPlayerJoinWorld, onChallengeCompleted custom ChallengeEvents
-  //TODO: make Modifiers be able to register eventy like with bukkit but for challenge
   private static final ChallengeAPI plugin = JavaPlugin.getPlugin(ChallengeAPI.class);
 
   private static final String WORLD_PREFIX = "world_challenge";
@@ -56,7 +45,8 @@ public class Challenge {
   private final AtomicReference<WorldCreator> overworldCreator = new AtomicReference<>();
   private final AtomicReference<WorldCreator> netherCreator = new AtomicReference<>();
   private final AtomicReference<WorldCreator> endCreator = new AtomicReference<>();
-  private final Set<ChallengeProxyEventExecutor> challengeProxyEventExecutors = new HashSet<>();
+  @Getter
+  private final EventEmitter eventEmitter = new EventEmitter(this);
   private ChallengeState state;
   @Setter
   private Set<RegisteredModifier> registeredModifiers;
@@ -184,7 +174,6 @@ public class Challenge {
     this.registeredModifiers.forEach(registered -> {
       try {
         modifiers.add(registered.createModifierInstance(this));
-        //this.modifiers.add(registered.modifier().getConstructor(Challenge.class).newInstance(this));
       } catch (Exception e) {
         getLogger().error(
             "Unable to instantiate modifier! Did you forget to add a constructor with a challenge arg?");
@@ -301,62 +290,4 @@ public class Challenge {
       );
     });
   }
-
-
-  /**
-   * Registers all the events in the given listener class
-   *
-   * @param listener Listener to register
-   * @param plugin   Plugin to register
-   */
-  public void registerEvents(@NotNull Listener listener, @NotNull Plugin plugin) {
-    challengeProxyEventExecutors.add(new ChallengeProxyEventExecutor(this, plugin, listener));
-  }
-
-  /**
-   * Register an executor with the event type `event`
-   *
-   * @param event    Event type to register
-   * @param executor EventExecutor to register
-   * @param plugin   Plugin to register
-   */
-  public void registerEvent(@NotNull Class<? extends Event> event, @NotNull EventExecutor executor, @NotNull Plugin plugin) {
-    challengeProxyEventExecutors.add(new ChallengeProxyEventExecutor(event, this, plugin, null, executor));
-  }
-
-  /**
-   * Registers the specified executor to the given event class
-   *
-   * @param event    Event type to register
-   * @param listener Listener to register
-   * @param priority Priority to register this event at
-   * @param executor EventExecutor to register
-   * @param plugin   Plugin to register
-   */
-  public void registerEvent(@NotNull Class<? extends Event> event, @NotNull Listener listener, @NotNull EventPriority priority, @NotNull EventExecutor executor, @NotNull Plugin plugin) {
-    challengeProxyEventExecutors.add(new ChallengeProxyEventExecutor(event, this, plugin, listener, priority, executor));
-  }
-
-  /**
-   * Registers the specified executor to the given event class
-   *
-   * @param event           Event type to register
-   * @param listener        Listener to register
-   * @param priority        Priority to register this event at
-   * @param executor        EventExecutor to register
-   * @param plugin          Plugin to register
-   * @param ignoreCancelled Whether to pass cancelled events or not
-   */
-  public void registerEvent(
-      @NotNull Class<? extends Event> event,
-      @NotNull Listener listener,
-      @NotNull EventPriority priority,
-      @NotNull EventExecutor executor,
-      @NotNull Plugin plugin,
-      boolean ignoreCancelled
-  ) {
-    challengeProxyEventExecutors.add(new ChallengeProxyEventExecutor(event, this, plugin, listener, priority, executor, ignoreCancelled));
-  }
-
-
 }

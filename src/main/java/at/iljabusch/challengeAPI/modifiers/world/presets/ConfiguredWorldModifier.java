@@ -12,6 +12,6 @@ public class ConfiguredWorldModifier extends Modifier {
     super(challenge);
     this.modifierConfig = modifierConfig;
 
-    challenge.registerEvents(new ConfiguredWorldModifierListener(modifierConfig), ChallengeAPI.getPlugin(ChallengeAPI.class));
+    challenge.getEventEmitter().registerEvents(new ConfiguredWorldModifierListener(modifierConfig), ChallengeAPI.getPlugin(ChallengeAPI.class));
   }
 }
