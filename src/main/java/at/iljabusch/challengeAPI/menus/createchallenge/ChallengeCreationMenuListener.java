@@ -1,7 +1,7 @@
 package at.iljabusch.challengeAPI.menus.createchallenge;
 
-import at.iljabusch.challengeAPI.Challenge;
-import at.iljabusch.challengeAPI.ChallengeManager;
+import at.iljabusch.challengeAPI.challenges.Challenge;
+import at.iljabusch.challengeAPI.challenges.ChallengeManager;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

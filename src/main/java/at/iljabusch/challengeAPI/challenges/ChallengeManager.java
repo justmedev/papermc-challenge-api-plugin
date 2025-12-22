@@ -1,5 +1,7 @@
-package at.iljabusch.challengeAPI;
+package at.iljabusch.challengeAPI.challenges;
 
+import at.iljabusch.challengeAPI.ChallengeAPI;
+import at.iljabusch.challengeAPI.challenges.events.PlayerInChallenge;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import lombok.Getter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;

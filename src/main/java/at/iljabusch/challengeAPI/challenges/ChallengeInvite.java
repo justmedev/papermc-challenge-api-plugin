@@ -1,4 +1,4 @@
-package at.iljabusch.challengeAPI;
+package at.iljabusch.challengeAPI.challenges;
 
 import java.util.UUID;
 

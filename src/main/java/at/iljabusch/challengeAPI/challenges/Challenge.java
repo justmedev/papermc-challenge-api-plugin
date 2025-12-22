@@ -1,5 +1,9 @@
-package at.iljabusch.challengeAPI;
+package at.iljabusch.challengeAPI.challenges;
 
+import at.iljabusch.challengeAPI.ChallengeAPI;
+import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerJoinEvent;
+import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerLeaveEvent;
+import at.iljabusch.challengeAPI.challenges.events.ChallengeStartedEvent;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import lombok.Getter;
@@ -9,34 +13,24 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.title.Title;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.mvplugins.multiverse.core.MultiverseCoreApi;
-import org.mvplugins.multiverse.core.utils.result.Attempt.Failure;
-import org.mvplugins.multiverse.core.world.LoadedMultiverseWorld;
-import org.mvplugins.multiverse.core.world.MultiverseWorld;
-import org.mvplugins.multiverse.core.world.options.CreateWorldOptions;
-import org.mvplugins.multiverse.core.world.options.DeleteWorldOptions;
-import org.mvplugins.multiverse.core.world.reasons.CreateFailureReason;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 @Getter
-
 public class Challenge {
-
   private static final ChallengeAPI plugin = JavaPlugin.getPlugin(ChallengeAPI.class);
 
   private static final String WORLD_PREFIX = "world_challenge";
@@ -46,59 +40,108 @@ public class Challenge {
   private final UUID creatorUUID;
   private final ChallengeWorlds worlds = new ChallengeWorlds();
   private final UUID worldUUID = UUID.randomUUID();
-  private final Set<Modifier> modifiers = new HashSet<>();
+  private final PluginManager pluginManager = plugin.getServer().getPluginManager();
+  private final AtomicReference<WorldCreator> overworldCreator = new AtomicReference<>();
+  private final AtomicReference<WorldCreator> netherCreator = new AtomicReference<>();
+  private final AtomicReference<WorldCreator> endCreator = new AtomicReference<>();
+  private final EventEmitter eventEmitter = new EventEmitter(this);
   private ChallengeState state;
   @Setter
   private Set<RegisteredModifier> registeredModifiers;
+  @Setter
+  private Set<Modifier> modifiers = new HashSet<>();
 
-  public Challenge(Player creator, Set<RegisteredModifier> modifiers) {
+  public Challenge(Player creator, Set<RegisteredModifier> options) {
     creator.sendRichMessage("<gold>Creating challenge ...");
-    this.registeredModifiers = modifiers;
+    this.registeredModifiers = options;
 
     this.creatorUUID = creator.getUniqueId();
     this.playerUUIDs.add(this.creatorUUID);
 
-    AtomicInteger successCount = new AtomicInteger();
+    var success = true;
     for (Environment env : List.of(Environment.NORMAL, Environment.NETHER, Environment.THE_END)) {
-      var suffix =
-          env == Environment.NETHER ? "_nether" :
-          env == Environment.THE_END ? "_the_end" : "";
-      MultiverseCoreApi.get().getWorldManager()
-                       .createWorld(
-                           CreateWorldOptions
-                               .worldName(WORLD_PREFIX + "_" + worldUUID + suffix)
-                               .environment(env)
-                       )
-                       .onSuccess(world -> {
-                         switch (world.getEnvironment()) {
-                           case NORMAL -> worlds.setNormal(world);
-                           case NETHER -> worlds.setNether(world);
-                           case THE_END -> worlds.setTheEnd(world);
-                         }
+      try {
+        AtomicReference<WorldCreator> ref = switch (env) {
+          case NORMAL -> overworldCreator;
+          case NETHER -> netherCreator;
+          case THE_END -> endCreator;
+          //TODO: support custom worlds created by modifiers or something i dont know sigma sigma boy
+          case CUSTOM -> null;
+        };
 
-                         var successes = successCount.getAndIncrement() + 1;
-                         if (successes >= 3) {
-                           this.state = ChallengeState.READY;
+        WorldCreator worldCreator = ref.get();
+        if (worldCreator == null) {
+          worldCreator = new WorldCreator(WORLD_PREFIX + "_" + worldUUID + "_" + env.name())
+              .environment(env)
+              .type(WorldType.NORMAL)
+              .generateStructures(true);
+          ref.set(worldCreator);
+        } else {
+          WorldCreator.name(WORLD_PREFIX + "_" + worldUUID + "_" + env.name());
+        }
 
-                           creator.sendRichMessage(
-                               """
-                                   <gold>Your challenge was created successfully!
-                                   Selected modifiers: <dark_red><modifiers></dark_red>
-                                   Use <dark_red><click:suggest_command:"/challenge invite ">/challenge invite <players></click></dark_red> to invite others to your challenge!
-                                   Use <dark_red><click:run_command:"/challenge start">/challenge start</click></dark_red> to start the challenge!""",
-                               Placeholder.unparsed(
-                                   "modifiers",
-                                   String.join(
-                                       ", ",
-                                       modifiers.stream().map(RegisteredModifier::name).toList()
-                                   )
-                               )
-                           );
-                         }
-                       })
-                       .onFailure(this::handleWorldCreationFailure)
-      ;
+        World world = worldCreator.createWorld();
+
+        switch (world.getEnvironment()) {
+          case NORMAL -> worlds.setNormal(world);
+          case NETHER -> worlds.setNether(world);
+          case THE_END -> worlds.setTheEnd(world);
+        }
+      } catch (Exception reason) {
+        getLogger().error("Failed to create world for challenge", reason);
+        getCreator().ifPresent(
+            player -> player.sendRichMessage("<red>Failed to create challenge!")
+        );
+        getOnlinePlayers().forEach(this::leave);
+        success = false;
+      }
     }
+
+    if (!success) return;
+    this.state = ChallengeState.READY;
+
+    creator.sendRichMessage(
+        """
+            <gold>Your challenge was created successfully!
+            Selected modifiers: <dark_red><modifiers></dark_red>
+            Use <dark_red><click:suggest_command:"/challenge invite ">/challenge invite <players></click></dark_red> to invite others to your challenge!
+            Use <dark_red><click:run_command:"/challenge start">/challenge start</click></dark_red> to start the challenge!""",
+        Placeholder.unparsed(
+            "modifiers",
+            String.join(", ", registeredModifiers.stream().map(RegisteredModifier::getName).toList())
+        )
+    );
+  }
+
+  public AtomicReference<WorldCreator> setWorldCreator(WorldCreator creator) {
+    switch (creator.environment()) {
+      case NETHER:
+        if (setSingleWorldCreator(overworldCreator, creator)) {
+          return overworldCreator;
+        }
+      case THE_END:
+        if (setSingleWorldCreator(netherCreator, creator)) {
+          return netherCreator;
+        }
+      case NORMAL:
+        if (setSingleWorldCreator(endCreator, creator)) {
+          return endCreator;
+        }
+
+    }
+    return null;
+  }
+
+  private boolean setSingleWorldCreator(AtomicReference<WorldCreator> ref, WorldCreator creator) {
+    if (ref.get() != null) {
+      getLogger().warn("Duplicate WorldMoifiers!\nCannot assign WorldModifier " + creator.environment().name() + " was already set!");
+      return false;
+    }
+    boolean success = ref.compareAndSet(null, creator);
+    if (!success) {
+      getLogger().warn("Assignment failed unexpectedly for  " + creator.environment().name() + "!");
+    }
+    return success;
   }
 
   private Optional<Player> getCreator() {
@@ -113,16 +156,6 @@ public class Challenge {
                       .toList();
   }
 
-  private void handleWorldCreationFailure(
-      Failure<LoadedMultiverseWorld, CreateFailureReason> reason
-  ) {
-    getLogger().error("Failed to create world for challenge: {}", reason);
-    getCreator().ifPresent(
-        player -> player.sendRichMessage("<red>Failed to create challenge!")
-    );
-    getOnlinePlayers().forEach(this::leave);
-  }
-
   public void start() {
     if (this.state != ChallengeState.READY) {
       getCreator().ifPresent(
@@ -134,7 +167,7 @@ public class Challenge {
     this.state = ChallengeState.ONGOING;
     this.registeredModifiers.forEach(registered -> {
       try {
-        this.modifiers.add(registered.modifier().getConstructor(Challenge.class).newInstance(this));
+        modifiers.add(registered.createModifierInstance(this));
       } catch (Exception e) {
         getLogger().error(
             "Unable to instantiate modifier! Did you forget to add a constructor with a challenge arg?");
@@ -173,7 +206,7 @@ public class Challenge {
               p.getInventory().clear();
 
               if (successCount.get() >= playerUUIDs.size()) {
-                this.modifiers.forEach(Modifier::onChallengeStarted);
+                pluginManager.callEvent(new ChallengeStartedEvent(this));
               }
             }
         );
@@ -191,39 +224,31 @@ public class Challenge {
     }
 
     if (this.state == ChallengeState.ONGOING) {
-      modifiers.forEach(mod -> mod.onPlayerJoin(player));
+      pluginManager.callEvent(new ChallengePlayerJoinEvent(this, player));
     }
     player.sendRichMessage("<gold>Challenge rejoined!");
   }
 
   public void leave(Player player) {
     if (playerUUIDs.remove(player.getUniqueId()) && state.isOngoingOrCompleted()) {
-      player.teleportAsync(
-          MultiverseCoreApi.get()
-                           .getWorldManager()
-                           .getDefaultWorld()
-                           .getOrNull()
-                           .getSpawnLocation()
-      ).thenAccept(success -> {
-        if (success && playerUUIDs.isEmpty()) {
-          getLogger().info("Challenge closing because all players left!");
-          modifiers.forEach(Modifier::onDispose);
-          for (MultiverseWorld world : List.of(worlds.normal, worlds.nether, worlds.theEnd)) {
-            MultiverseCoreApi.get()
-                             .getWorldManager()
-                             .deleteWorld(DeleteWorldOptions.world(world))
-                             .onFailure(reason -> getLogger()
-                                 .warn("Failed to delete world after challenge closure: {}", reason.get()));
-          }
-        }
-      });
+      player.teleportAsync(Bukkit.getWorld("world").getSpawnLocation()); // TODO: dynamic default world name
+    }
+    if (!playerUUIDs.isEmpty()) {
+      return;
+    }
+
+    getLogger().info("Challenge closing because all players left!");
+    for (World world : List.of(worlds.normal, worlds.nether, worlds.theEnd)) {
+      if (!Utils.deleteBukkitWorld(world)) {
+        getLogger().warn("Unable to delete world {}!", world.getName());
+      }
     }
   }
 
   public void leaveServer(Player player) {
     Bukkit.getScheduler().runTask(
         plugin,
-        () -> this.modifiers.forEach(mod -> mod.onPlayerLeave(player))
+        () -> pluginManager.callEvent(new ChallengePlayerLeaveEvent(this, player))
     );
   }
 

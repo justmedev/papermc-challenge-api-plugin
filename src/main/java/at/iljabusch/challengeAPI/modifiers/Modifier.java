@@ -1,8 +1,7 @@
 package at.iljabusch.challengeAPI.modifiers;
 
-import at.iljabusch.challengeAPI.Challenge;
+import at.iljabusch.challengeAPI.challenges.Challenge;
 import lombok.Getter;
-import org.bukkit.entity.Player;
 
 public abstract class Modifier {
 
@@ -13,14 +12,4 @@ public abstract class Modifier {
     this.challenge = challenge;
   }
 
-  public abstract void onChallengeStarted();
-
-  public void onPlayerJoin(Player player) {
-  }
-
-  public void onPlayerLeave(Player player) {
-  }
-
-  public void onDispose() {
-  }
 }

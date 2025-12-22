@@ -21,9 +21,9 @@ public class ModifierMenuItem implements InventoryItem {
   public @NonNull ItemStack getItemStack() {
     // TODO: disallow reserved materials
     return ChallengeCreationMenu.createGuiItem(
-        mod.displayItem(),
-        mod.name(),
-        Component.text(mod.author()),
+        mod.getDisplayItem(),
+        mod.getName(),
+        Component.text(mod.getAuthor()),
         isActive ? Component.text("[Enabled]", NamedTextColor.GREEN)
                  : Component.text("[Disabled]", NamedTextColor.RED)
     );

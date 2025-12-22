@@ -1,12 +1,15 @@
-package at.iljabusch.challengeAPI;
+package at.iljabusch.challengeAPI.challenges;
 
+import at.iljabusch.challengeAPI.ChallengeAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.Iterator;
 
 public class Utils {
@@ -32,5 +35,13 @@ public class Utils {
           5L
       );
     }
+  }
+
+  static boolean deleteBukkitWorld(World world) {
+    Bukkit.unloadWorld(world, false);
+
+    var folder = new File(Bukkit.getWorldContainer(), world.getName());
+    if (folder.exists()) return folder.delete();
+    return true;
   }
 }

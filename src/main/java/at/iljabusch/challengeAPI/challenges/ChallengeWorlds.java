@@ -1,19 +1,17 @@
-package at.iljabusch.challengeAPI;
+package at.iljabusch.challengeAPI.challenges;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.mvplugins.multiverse.core.world.MultiverseWorld;
+import org.bukkit.World;
 
 @Setter
 @Getter
-
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChallengeWorlds {
-
-  MultiverseWorld normal;
-  MultiverseWorld nether;
-  MultiverseWorld theEnd;
+  World normal;
+  World nether;
+  World theEnd;
 }

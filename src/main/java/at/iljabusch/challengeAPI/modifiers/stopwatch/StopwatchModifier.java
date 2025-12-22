@@ -1,27 +1,53 @@
 package at.iljabusch.challengeAPI.modifiers.stopwatch;
 
-import at.iljabusch.challengeAPI.Challenge;
 import at.iljabusch.challengeAPI.ChallengeAPI;
+import at.iljabusch.challengeAPI.challenges.Challenge;
+import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerJoinEvent;
+import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerLeaveEvent;
+import at.iljabusch.challengeAPI.challenges.events.ChallengeStartedEvent;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
-public class StopwatchModifier extends Modifier {
+public class StopwatchModifier extends Modifier implements Listener {
 
   private double secondsPlayed = 0;
   private BukkitTask task;
 
   public StopwatchModifier(Challenge challenge) {
     super(challenge);
-  }
 
-  @Override
-  public void onChallengeStarted() {
-    startTask();
+    challenge.getEventEmitter().registerEvent(
+        ChallengeStartedEvent.class,
+        (listener, event) -> startTask(),
+        JavaPlugin.getPlugin(ChallengeAPI.class)
+    );
+
+    challenge.getEventEmitter().registerEvent(
+        ChallengePlayerJoinEvent.class,
+        (listener, event) -> {
+          if (task.isCancelled()) {
+            startTask();
+          }
+        },
+        JavaPlugin.getPlugin(ChallengeAPI.class)
+    );
+
+    challenge.getEventEmitter().registerEvent(
+        ChallengePlayerLeaveEvent.class,
+        (listener, event) -> {
+          if (!challenge.getOnlinePlayers().isEmpty()) {
+            return;
+          }
+          task.cancel();
+        },
+        JavaPlugin.getPlugin(ChallengeAPI.class)
+    );
+
   }
 
   public void startTask() {
@@ -41,25 +67,5 @@ public class StopwatchModifier extends Modifier {
           });
         }, 0L, 20L /* 1s */
     );
-  }
-
-  @Override
-  public void onPlayerJoin(Player player) {
-    if (task.isCancelled()) {
-      startTask();
-    }
-  }
-
-  @Override
-  public void onPlayerLeave(Player player) {
-    if (!challenge.getOnlinePlayers().isEmpty()) {
-      return;
-    }
-    task.cancel();
-  }
-
-  @Override
-  public void onDispose() {
-    task.cancel();
   }
 }

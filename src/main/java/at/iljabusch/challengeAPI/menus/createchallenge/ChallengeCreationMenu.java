@@ -1,7 +1,7 @@
 package at.iljabusch.challengeAPI.menus.createchallenge;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
-import at.iljabusch.challengeAPI.ChallengeManager;
+import at.iljabusch.challengeAPI.challenges.ChallengeManager;
 import at.iljabusch.challengeAPI.menus.InventoryPager;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import lombok.Getter;
@@ -44,7 +44,7 @@ public class ChallengeCreationMenu implements InventoryHolder {
       var registeredMod = ChallengeManager.getInstance().getRegisteredModifiers().get(i);
       var cmi = new ModifierMenuItem(registeredMod, false);
 
-      if (registeredMod.displayItem() == CREATE_CHALLENGE_MATERIAL) {
+      if (registeredMod.getDisplayItem() == CREATE_CHALLENGE_MATERIAL) {
         getLogger().warn("{} is not allowed for modifiers!", CREATE_CHALLENGE_MATERIAL);
         continue;
       }
@@ -57,7 +57,6 @@ public class ChallengeCreationMenu implements InventoryHolder {
     inventoryPager.drawPageArrows();
     this.inventory.setItem(8, createGuiItem(CREATE_CHALLENGE_MATERIAL, "Create challenge"));
   }
-
 
   public static ItemStack createGuiItem(Material material, String name, final Component... lore) {
     final var item = new ItemStack(material, 1);
