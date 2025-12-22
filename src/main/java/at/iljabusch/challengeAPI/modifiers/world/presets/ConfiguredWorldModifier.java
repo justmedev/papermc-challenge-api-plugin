@@ -14,6 +14,4 @@ public class ConfiguredWorldModifier extends Modifier {
 
     challenge.registerEvents(new ConfiguredWorldModifierListener(modifierConfig), ChallengeAPI.getPlugin(ChallengeAPI.class));
   }
-
-
 }

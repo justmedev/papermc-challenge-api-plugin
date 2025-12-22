@@ -40,6 +40,10 @@ public class ChallengeProxyEventExecutor implements EventExecutor, Listener {
     this(event, challenge, plugin, userListener, priority, executor, false);
   }
 
+  public ChallengeProxyEventExecutor(Class<? extends Event> event, Challenge challenge, Plugin plugin, EventPriority priority, EventExecutor executor) {
+    this(event, challenge, plugin, null, priority, executor, false);
+  }
+
   public ChallengeProxyEventExecutor(Class<? extends Event> event, Challenge challenge, Plugin plugin, Listener userListener, EventPriority priority, EventExecutor executor, boolean ignoreCancelled) {
     this.challenge = challenge;
     this.plugin = plugin;

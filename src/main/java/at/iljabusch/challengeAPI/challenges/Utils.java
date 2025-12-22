@@ -39,23 +39,10 @@ public class Utils {
 
 
   static boolean deleteBukkitWorld(World world) {
-    //TODO: actully do this skibedy
     Bukkit.unloadWorld(world, false);
 
-    File folder = new File(Bukkit.getWorldContainer(), world.getName());
-
-    if (folder.exists()) {
-      File[] files = folder.listFiles();
-      if (files != null) {
-        for (File file : files) {
-          if (file.isDirectory()) {
-          } else {
-            file.delete();
-          }
-        }
-      }
-      return folder.delete();
-    }
+    var folder = new File(Bukkit.getWorldContainer(), world.getName());
+    if (folder.exists()) return folder.delete();
     return true;
   }
 }

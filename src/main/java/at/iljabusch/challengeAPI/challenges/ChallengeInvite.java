@@ -1,7 +1,5 @@
 package at.iljabusch.challengeAPI.challenges;
 
-import at.iljabusch.challengeAPI.Challenge;
-
 import java.util.UUID;
 
 public record ChallengeInvite(

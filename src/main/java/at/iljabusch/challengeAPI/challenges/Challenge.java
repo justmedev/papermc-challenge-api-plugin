@@ -260,10 +260,9 @@ public class Challenge {
 
     getLogger().info("Challenge closing because all players left!");
     for (World world : List.of(worlds.normal, worlds.nether, worlds.theEnd)) {
-      Utils.deleteBukkitWorld(world);
-      //MultiverseCoreApi.get()
-      //    .getWorldManager()
-      //    .deleteWorld(DeleteWorldOptions.world(world));
+      if (!Utils.deleteBukkitWorld(world)) {
+        getLogger().warn("Unable to delete world {}!", world.getName());
+      }
     }
   }
 
@@ -312,7 +311,17 @@ public class Challenge {
    */
   public void registerEvents(@NotNull Listener listener, @NotNull Plugin plugin) {
     challengeProxyEventExecutors.add(new ChallengeProxyEventExecutor(this, plugin, listener));
+  }
 
+  /**
+   * Register an executor with the event type `event`
+   *
+   * @param event    Event type to register
+   * @param executor EventExecutor to register
+   * @param plugin   Plugin to register
+   */
+  public void registerEvent(@NotNull Class<? extends Event> event, @NotNull EventExecutor executor, @NotNull Plugin plugin) {
+    challengeProxyEventExecutors.add(new ChallengeProxyEventExecutor(event, this, plugin, null, executor));
   }
 
   /**

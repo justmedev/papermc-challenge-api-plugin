@@ -7,13 +7,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class SharedHealthModifier extends Modifier {
 
-  private final SharedHealthModifierEventListener eventListener = new SharedHealthModifierEventListener(
-      this);
-
   public SharedHealthModifier(Challenge challenge) {
     super(challenge);
+    SharedHealthModifierEventListener eventListener = new SharedHealthModifierEventListener(this);
     challenge.registerEvents(eventListener, JavaPlugin.getPlugin(ChallengeAPI.class));
-
   }
 
 }

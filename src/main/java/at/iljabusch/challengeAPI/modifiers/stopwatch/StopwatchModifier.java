@@ -2,55 +2,50 @@ package at.iljabusch.challengeAPI.modifiers.stopwatch;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
 import at.iljabusch.challengeAPI.challenges.Challenge;
+import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerJoinEvent;
+import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerLeaveEvent;
 import at.iljabusch.challengeAPI.challenges.events.ChallengeStartedEvent;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
-public class StopwatchModifier extends Modifier {
+public class StopwatchModifier extends Modifier implements Listener {
 
   private double secondsPlayed = 0;
   private BukkitTask task;
 
   public StopwatchModifier(Challenge challenge) {
     super(challenge);
-    challenge.registerEvent(
-        ChallengeStartedEvent.class,
-        null,
-        EventPriority.NORMAL,
-        (listener, event) -> {
-          startTask();
-        },
-        ChallengeAPI.getPlugin(ChallengeAPI.class)
-    );
 
     challenge.registerEvent(
         ChallengeStartedEvent.class,
-        null,
-        EventPriority.NORMAL,
+        (listener, event) -> startTask(),
+        JavaPlugin.getPlugin(ChallengeAPI.class)
+    );
+
+    challenge.registerEvent(
+        ChallengePlayerJoinEvent.class,
         (listener, event) -> {
           if (task.isCancelled()) {
             startTask();
           }
         },
-        ChallengeAPI.getPlugin(ChallengeAPI.class)
+        JavaPlugin.getPlugin(ChallengeAPI.class)
     );
 
     challenge.registerEvent(
-        ChallengeStartedEvent.class,
-        null,
-        EventPriority.NORMAL,
+        ChallengePlayerLeaveEvent.class,
         (listener, event) -> {
           if (!challenge.getOnlinePlayers().isEmpty()) {
             return;
           }
           task.cancel();
         },
-        ChallengeAPI.getPlugin(ChallengeAPI.class)
+        JavaPlugin.getPlugin(ChallengeAPI.class)
     );
 
   }
