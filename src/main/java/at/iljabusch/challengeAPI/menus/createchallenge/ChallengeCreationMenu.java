@@ -1,8 +1,10 @@
-package at.iljabusch.challengeAPI.menus;
+package at.iljabusch.challengeAPI.menus.createchallenge;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
 import at.iljabusch.challengeAPI.challenges.ChallengeManager;
+import at.iljabusch.challengeAPI.menus.InventoryPager;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
+import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -10,7 +12,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -20,47 +21,40 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 
 public class ChallengeCreationMenu implements InventoryHolder {
 
-  public static Material CREATE_CHALLENGE_MATERIAL = Material.GREEN_BANNER;
+  public static final Material CREATE_CHALLENGE_MATERIAL = Material.GREEN_BANNER;
+  private static final ChallengeAPI plugin = JavaPlugin.getPlugin(ChallengeAPI.class);
+  @Getter
+  private final Inventory inventory = plugin.getServer().createInventory(this, 9 * 3);
+  @Getter
+  private final InventoryPager<ModifierMenuItem> inventoryPager = new InventoryPager<>(this);
 
   /// ```
-  /// Inventory (9x3) M=modifier, S=start challenge, r=reserved, e=must be empty
+  /// Inventory (9x3) M=modifier, S=start challenge, r=reserved, paging: p=previous, n=next
   ///  0  1  2  3  4  5  6  7  8   <--   INDEX
-  /// [M][M][M][M][M][M][M][e][S]
-  /// [M][M][M][M][ ][ ][ ][e][r]
-  /// [ ][ ][ ][ ][ ][ ][ ][e][r]
+  /// [M][M][M][M][M][M][M][r][S]
+  /// [M][M][M][M][ ][ ][ ][r][r]
+  /// [ ][ ][ ][ ][ ][ ][ ][p][n]
   /// ```
-  private final Inventory inventory;
-  private final HashMap<Integer, ChallengeMenuItem> inventoryMap = new HashMap<>();
 
   public ChallengeCreationMenu() {
-    var plugin = JavaPlugin.getPlugin(ChallengeAPI.class);
-    this.inventory = plugin.getServer().createInventory(this, 9 * 3);
+    inventoryPager.setPagedSectionDimensions(7, 3);
 
+    var rawMap = new HashMap<Integer, ModifierMenuItem>();
     for (int i = 0; i < ChallengeManager.getInstance().getRegisteredModifiers().size(); i++) {
       var registeredMod = ChallengeManager.getInstance().getRegisteredModifiers().get(i);
-      var cmi = new ChallengeMenuItem(registeredMod, false);
+      var cmi = new ModifierMenuItem(registeredMod, false);
 
-      // This is done to skip e, S and r fields!
-      var index = i;
-      if (index > 6) {
-        index += 2;
-      }
-      if (index > 15) {
-        index += 2;
-      }
-      if (index > 7 * 3) {
-        getLogger().warn("Too many modifiers! Paging not yet supported");
-        return;
-      }
-      if (registeredMod.getDisplayItem() == CREATE_CHALLENGE_MATERIAL) {
+      if (registeredMod.displayItem() == CREATE_CHALLENGE_MATERIAL) {
         getLogger().warn("{} is not allowed for modifiers!", CREATE_CHALLENGE_MATERIAL);
         continue;
       }
 
-      this.inventory.setItem(index, cmi.getGuiItem());
-      inventoryMap.put(index, cmi);
+      rawMap.put(i, cmi);
     }
 
+    inventoryPager.autoPage(rawMap);
+    inventoryPager.drawPage();
+    inventoryPager.drawPageArrows();
     this.inventory.setItem(8, createGuiItem(CREATE_CHALLENGE_MATERIAL, "Create challenge"));
   }
 
@@ -75,21 +69,15 @@ public class ChallengeCreationMenu implements InventoryHolder {
     return item;
   }
 
-  @Override
-  public @NonNull Inventory getInventory() {
-    return this.inventory;
-  }
-
-  public @Nullable ChallengeMenuItem getMenuItemAtIndex(int index) {
-    return this.inventoryMap.get(index);
-  }
-
   public @NonNull Collection<RegisteredModifier> getActiveModifiers() {
-    return this.inventoryMap
-        .values()
-        .stream()
-        .filter(ChallengeMenuItem::isActive)
-        .map(ChallengeMenuItem::getMod)
-        .toList();
+    return inventoryPager.getPages().stream()
+                         .map(page -> page
+                             .values()
+                             .stream()
+                             .filter(ModifierMenuItem::isActive)
+                             .map(ModifierMenuItem::getMod)
+                             .toList())
+                         .flatMap(List::stream)
+                         .toList();
   }
 }

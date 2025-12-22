@@ -9,8 +9,6 @@ public class SharedHealthModifier extends Modifier {
 
   public SharedHealthModifier(Challenge challenge) {
     super(challenge);
-    SharedHealthModifierEventListener eventListener = new SharedHealthModifierEventListener(this);
-    challenge.registerEvents(eventListener, JavaPlugin.getPlugin(ChallengeAPI.class));
+    challenge.registerEvents(new SharedHealthModifierEventListener(this), JavaPlugin.getPlugin(ChallengeAPI.class));
   }
-
 }

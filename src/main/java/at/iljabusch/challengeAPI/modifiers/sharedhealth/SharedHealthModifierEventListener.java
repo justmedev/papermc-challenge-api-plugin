@@ -1,15 +1,14 @@
 package at.iljabusch.challengeAPI.modifiers.sharedhealth;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
+import at.iljabusch.challengeAPI.ChallengeState;
 import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerJoinEvent;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
-import org.bukkit.event.entity.EntityRegainHealthEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.jspecify.annotations.NonNull;
@@ -30,8 +29,9 @@ public class SharedHealthModifierEventListener implements Listener {
     this.modifier = modifier;
   }
 
-  public boolean isPlayerNotPartOfChallenge(Player player) {
-    return !modifier.getChallenge().getPlayerUUIDs().contains(player);
+  public boolean isPlayerNotPartOfActiveChallenge(Player player) {
+    return !modifier.getChallenge().getPlayerUUIDs().contains(player.getUniqueId())
+        || modifier.getChallenge().getState() != ChallengeState.ONGOING;
   }
 
 
@@ -69,7 +69,7 @@ public class SharedHealthModifierEventListener implements Listener {
     if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
       return;
     }
-    if (isPlayerNotPartOfChallenge(p)) {
+    if (isPlayerNotPartOfActiveChallenge(p)) {
       return;
     }
 
@@ -87,7 +87,7 @@ public class SharedHealthModifierEventListener implements Listener {
     if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
       return;
     }
-    if (isPlayerNotPartOfChallenge(p)) {
+    if (isPlayerNotPartOfActiveChallenge(p)) {
       return;
     }
 
@@ -99,7 +99,7 @@ public class SharedHealthModifierEventListener implements Listener {
     if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
       return;
     }
-    if (isPlayerNotPartOfChallenge(p)) {
+    if (isPlayerNotPartOfActiveChallenge(p)) {
       return;
     }
 
@@ -111,11 +111,24 @@ public class SharedHealthModifierEventListener implements Listener {
     if (!(event.getEntity() instanceof Player p) || isSyncing.contains(p.getUniqueId())) {
       return;
     }
-    if (isPlayerNotPartOfChallenge(p)) {
+    if (isPlayerNotPartOfActiveChallenge(p)) {
       return;
     }
 
     plugin.getServer().getScheduler().runTask(plugin, () -> syncAll(p));
+  }
+
+  @EventHandler(ignoreCancelled = true)
+  public void onDragonDeath(EntityDeathEvent event) {
+    if (!(event.getEntity() instanceof EnderDragon dragon)) {
+      return;
+    }
+    if (!event.getEntity().getWorld().getName()
+              .equals(modifier.getChallenge().getWorlds().getTheEnd().getName())) {
+      return;
+    }
+
+    modifier.getChallenge().complete(true);
   }
 
   @EventHandler

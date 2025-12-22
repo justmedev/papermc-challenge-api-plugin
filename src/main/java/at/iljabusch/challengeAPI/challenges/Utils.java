@@ -37,7 +37,6 @@ public class Utils {
     }
   }
 
-
   static boolean deleteBukkitWorld(World world) {
     Bukkit.unloadWorld(world, false);
 

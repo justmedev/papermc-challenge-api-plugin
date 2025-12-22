@@ -44,7 +44,7 @@ public class ChallengeManager {
   }
 
   public void registerModifier(RegisteredModifier registeredModifier) {
-    this.registeredModifiers.add(registeredModifier);
+    registeredModifiers.add(registeredModifier);
   }
 
   public boolean canCreateChallenge(Player player) {
