@@ -165,7 +165,7 @@ public class Challenge {
   private void handleWorldCreationFailure(
       Exception reason
   ) {
-    getLogger().error("Failed to create world for challenge: {}", reason);
+    getLogger().error("Failed to create world for challenge", reason);
     getCreator().ifPresent(
         player -> player.sendRichMessage("<red>Failed to create challenge!")
     );

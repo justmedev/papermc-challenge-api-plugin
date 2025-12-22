@@ -4,10 +4,11 @@ import at.iljabusch.challengeAPI.challenges.Challenge;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 import java.lang.reflect.InvocationTargetException;
+
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 @Data
 @AllArgsConstructor
@@ -19,13 +20,12 @@ public class RegisteredModifier {
   Class<? extends Modifier> modifier;
 
 
-  public <G extends Modifier> G createModifierInstance(Challenge challenge) {
+  public Modifier createModifierInstance(Challenge challenge) {
     try {
-      Modifier modiierInstance = modifier.getDeclaredConstructor(Challenge.class).newInstance(challenge);
-      return (G) modiierInstance;
+      return modifier.getDeclaredConstructor(Challenge.class).newInstance(challenge);
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-      Bukkit.getLogger().warning("Could not instantiate " + modifier.getName() + " starting challenge " + challenge.getWorldUUID() + " without!");
-      Bukkit.getLogger().warning(e.getMessage());
+      getLogger().warn("Could not instantiate {} starting challenge {} without!", modifier.getName(), challenge.getWorldUUID());
+      getLogger().warn(e.getMessage());
       return null;
     }
   }

@@ -5,6 +5,7 @@ import at.iljabusch.challengeAPI.challenges.Challenge;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.generator.ChunkGenerator;
@@ -13,6 +14,10 @@ import org.bukkit.plugin.Plugin;
 import java.lang.reflect.InvocationTargetException;
 import java.util.stream.Collectors;
 
+import static org.apache.logging.log4j.LogManager.getLogger;
+
+
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
   WorldModifierConfig config;
@@ -33,7 +38,7 @@ public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
   public static RegisteredConfiguredWorldModifier fromPlugin(String name, Material material, String worldName, String generatorId) {
     Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
     if (plugin == null) {
-      Bukkit.getLogger().warning("Plugin '" + name + "' not found! Could not register!");
+      getLogger().warn("Plugin '{}' not found! Could not register!", name);
       return null;
     }
     return fromPlugin(plugin, material, worldName, generatorId);
@@ -47,15 +52,22 @@ public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
     try {
       plugin.getClass().getMethod("getDefaultWorldGenerator", String.class, String.class);
     } catch (NoSuchMethodException e) {
-      Bukkit.getLogger().warning("Plugin '" + plugin.getName() + "' does not seem to define a default world generator!");
+      getLogger().warn("Plugin '{}' does not seem to define a default world generator!", plugin.getName());
       return null;
     }
     RegisteredConfiguredWorldModifier registeredMod = new RegisteredConfiguredWorldModifier();
     registeredMod.setName(plugin.getName());
-    registeredMod.setAuthor(plugin.getDescription().getAuthors().stream()
-                                  .limit(plugin.getDescription().getAuthors().size() - 1)
+    registeredMod.setAuthor(plugin.getPluginMeta()
+                                  .getAuthors()
+                                  .stream()
+                                  .limit(plugin
+                                             .getPluginMeta()
+                                             .getAuthors()
+                                             .size() - 1)
                                   .collect(Collectors.joining(", ", "", ", "))
-                                + plugin.getDescription().getAuthors().getLast());
+                                + plugin.getPluginMeta()
+                                        .getAuthors()
+                                        .getLast());
     registeredMod.setDisplayItem(material);
     registeredMod.setConfig(WorldModifierConfig.builder().chunkGenerator(plugin.getDefaultWorldGenerator(worldName, generatorId)).build());
     return registeredMod;
@@ -77,22 +89,22 @@ public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
     registeredMod.setName(preset.getDisplayName());
     registeredMod.setAuthor("Challenge API");
     registeredMod.setDisplayItem(preset.getPresetDefaultMaterial());
-    registeredMod.setConfig(WorldModifierConfig.getPresetWorldModifierConfig(preset));
+    registeredMod.setConfig(WorldModifierConfig.getPresetWorldModifierConfig(preset).build());
 
     return registeredMod;
   }
 
   @Override
-  public <G extends Modifier> G createModifierInstance(Challenge challenge) {
+  public Modifier createModifierInstance(Challenge challenge) {
     try {
       if (this.getModifier().isInstance(ConfiguredWorldModifier.class)) {
-        return (G) this.getModifier().getDeclaredConstructor(Challenge.class, WorldModifierConfig.class).newInstance(challenge, config);
+        return this.getModifier().getDeclaredConstructor(Challenge.class, WorldModifierConfig.class).newInstance(challenge, config);
       } else {
-        return (G) this.getModifier().getDeclaredConstructor(Challenge.class).newInstance(challenge);
+        return this.getModifier().getDeclaredConstructor(Challenge.class).newInstance(challenge);
       }
     } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-      Bukkit.getLogger().severe("Could not instantiate " + this.getModifier().getName() + " starting challenge " + challenge.getWorldUUID() + " without!");
-      Bukkit.getLogger().severe(e.getMessage());
+      getLogger().error("Could not instantiate {} starting challenge {} without!", this.getModifier().getName(), challenge.getWorldUUID());
+      getLogger().error(e.getMessage());
     }
     return null;
   }
