@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.jspecify.annotations.NonNull;
 
 import java.util.HashSet;
 
@@ -15,7 +16,7 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 public class ChallengeCreationMenuListener implements Listener {
 
   @EventHandler
-  public void onInventoryClick(InventoryClickEvent event) {
+  public void onInventoryClick(@NonNull InventoryClickEvent event) {
 
     var inventory = event.getInventory();
     if (!(inventory.getHolder(false) instanceof ChallengeCreationMenu ccm)) {

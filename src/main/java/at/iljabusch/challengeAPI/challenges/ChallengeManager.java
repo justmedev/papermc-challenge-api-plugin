@@ -8,6 +8,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -25,18 +26,18 @@ public class ChallengeManager {
   private ChallengeManager() {
   }
 
-  public static synchronized ChallengeManager getInstance() {
+  public static synchronized @NonNull ChallengeManager getInstance() {
     if (instance == null) {
       instance = new ChallengeManager();
     }
     return instance;
   }
 
-  public void registerNewChallenge(Challenge challenge, Player creator) {
+  public void registerNewChallenge(Challenge challenge, @NonNull Player creator) {
     playersInChallenges.put(creator.getUniqueId(), new PlayerInChallenge(challenge, creator));
   }
 
-  public void registerPlayersInChallenge(Challenge challenge, Collection<Player> players) {
+  public void registerPlayersInChallenge(@NonNull Challenge challenge, @NonNull Collection<Player> players) {
     players.forEach(p -> {
       playersInChallenges.put(p.getUniqueId(), new PlayerInChallenge(challenge, p));
       challenge.join(p);
@@ -47,11 +48,11 @@ public class ChallengeManager {
     registeredModifiers.add(registeredModifier);
   }
 
-  public boolean canCreateChallenge(Player player) {
+  public boolean canCreateChallenge(@NonNull Player player) {
     return !playersInChallenges.containsKey(player.getUniqueId());
   }
 
-  public void leaveChallenge(Player player) {
+  public void leaveChallenge(@NonNull Player player) {
     var playerInChallenge = playersInChallenges.remove(player.getUniqueId());
     if (playerInChallenge == null) {
       player.sendRichMessage("<red>You are not partaking in any challenges!");
@@ -62,7 +63,7 @@ public class ChallengeManager {
     player.sendRichMessage("<gold>Successfully left the challenge!");
   }
 
-  public void invitePlayerToChallenge(Player invitee, Player invited) {
+  public void invitePlayerToChallenge(@NonNull Player invitee, @NonNull Player invited) {
     var playerInChallenge = playersInChallenges.get(invitee.getUniqueId());
     if (playerInChallenge == null) {
       getLogger().warn("invitePlayerToChallenge called with a player that was not in a challenge!");
@@ -89,7 +90,7 @@ public class ChallengeManager {
     );
   }
 
-  public void acceptInviteToChallenge(Player invited) {
+  public void acceptInviteToChallenge(@NonNull Player invited) {
     var invite = pendingInvites.remove(invited.getUniqueId());
     if (invite == null) {
       invited.sendRichMessage("<red>No invite found! Maybe it expired?");
@@ -119,7 +120,7 @@ public class ChallengeManager {
     );
   }
 
-  public void startChallenge(Player creator) {
+  public void startChallenge(@NonNull Player creator) {
     var playerInChallenge = playersInChallenges.get(creator.getUniqueId());
     if (playerInChallenge == null) {
       creator.sendRichMessage("<red>You are not partaking in a challenge!");

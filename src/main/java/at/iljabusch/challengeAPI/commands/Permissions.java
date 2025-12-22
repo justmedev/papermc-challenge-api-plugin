@@ -1,6 +1,8 @@
 package at.iljabusch.challengeAPI.commands;
 
+import org.jspecify.annotations.NonNull;
+
 public class Permissions {
 
-  public static String CHALLENGE_CREATE = "challengeapi.challenge.create";
+  public static @NonNull String CHALLENGE_CREATE = "challengeapi.challenge.create";
 }
