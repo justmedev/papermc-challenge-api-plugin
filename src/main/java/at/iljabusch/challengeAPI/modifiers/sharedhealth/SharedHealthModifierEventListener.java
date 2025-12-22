@@ -1,7 +1,7 @@
 package at.iljabusch.challengeAPI.modifiers.sharedhealth;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
-import at.iljabusch.challengeAPI.ChallengeState;
+import at.iljabusch.challengeAPI.challenges.ChallengeState;
 import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerJoinEvent;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EnderDragon;
