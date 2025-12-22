@@ -20,38 +20,38 @@ public class ChallengeCmd {
     var rootCmd = Commands.literal("challenge");
 
     var createCmd = Commands.literal("create")
-        .executes(ChallengeCmd::runCreateLogic);
+                            .executes(ChallengeCmd::runCreateLogic);
 
     var createInviteCmd = Commands.literal("invite")
-        .executes(ctx -> {
-          ctx.getSource().getSender()
-              .sendRichMessage("<red>You have to include the required argument players!</red>");
-          return Command.SINGLE_SUCCESS;
-        })
-        .then(
-            Commands.argument("players", ArgumentTypes.players())
-                .executes(ChallengeCmd::runInviteLogic)
-        );
+                                  .executes(ctx -> {
+                                    ctx.getSource().getSender()
+                                       .sendRichMessage("<red>You have to include the required argument players!</red>");
+                                    return Command.SINGLE_SUCCESS;
+                                  })
+                                  .then(
+                                      Commands.argument("players", ArgumentTypes.players())
+                                              .executes(ChallengeCmd::runInviteLogic)
+                                  );
 
     var acceptInviteCmd = Commands.literal("accept")
-        .executes(ctx -> {
-          ctx.getSource().getSender()
-              .sendRichMessage("<red>You have to include the required argument player!</red>");
-          return Command.SINGLE_SUCCESS;
-        })
-        .then(
-            Commands.argument("player", ArgumentTypes.player())
-                .executes(ChallengeCmd::runAcceptInviteLogic)
-        );
+                                  .executes(ctx -> {
+                                    ctx.getSource().getSender()
+                                       .sendRichMessage("<red>You have to include the required argument player!</red>");
+                                    return Command.SINGLE_SUCCESS;
+                                  })
+                                  .then(
+                                      Commands.argument("player", ArgumentTypes.player())
+                                              .executes(ChallengeCmd::runAcceptInviteLogic)
+                                  );
 
     var leaveCmd = Commands.literal("leave")
-        .executes(ChallengeCmd::runLeaveChallengeLogic);
+                           .executes(ChallengeCmd::runLeaveChallengeLogic);
 
     var startCmd = Commands.literal("start")
-        .executes(ChallengeCmd::runStartLogic);
+                           .executes(ChallengeCmd::runStartLogic);
 
     var infoCmd = Commands.literal("info")
-        .executes(ChallengeCmd::runInfoLogic);
+                          .executes(ChallengeCmd::runInfoLogic);
 
     rootCmd.then(createCmd);
     rootCmd.then(createInviteCmd);
@@ -98,7 +98,7 @@ public class ChallengeCmd {
   private static int runAcceptInviteLogic(CommandContext<CommandSourceStack> ctx) {
     var sender = ctx.getSource().getSender();
     if (!(sender instanceof Player) || !(ctx.getSource()
-        .getExecutor() instanceof Player executor)) {
+                                            .getExecutor() instanceof Player executor)) {
       sender.sendRichMessage("<red>Only players can use this command!");
       return Command.SINGLE_SUCCESS;
     }
@@ -110,7 +110,7 @@ public class ChallengeCmd {
   private static int runCreateLogic(CommandContext<CommandSourceStack> ctx) {
     var sender = ctx.getSource().getSender();
     if (!(sender instanceof Player) || !(ctx.getSource()
-        .getExecutor() instanceof Player executor)) {
+                                            .getExecutor() instanceof Player executor)) {
       sender.sendRichMessage("<red>Only players can use this command!");
       return Command.SINGLE_SUCCESS;
     }
@@ -130,7 +130,7 @@ public class ChallengeCmd {
   private static int runLeaveChallengeLogic(CommandContext<CommandSourceStack> ctx) {
     var sender = ctx.getSource().getSender();
     if (!(sender instanceof Player) || !(ctx.getSource()
-        .getExecutor() instanceof Player executor)) {
+                                            .getExecutor() instanceof Player executor)) {
       sender.sendRichMessage("<red>Only players can use this command!");
       return Command.SINGLE_SUCCESS;
     }
@@ -142,7 +142,7 @@ public class ChallengeCmd {
   private static int runStartLogic(CommandContext<CommandSourceStack> ctx) {
     var sender = ctx.getSource().getSender();
     if (!(sender instanceof Player) || !(ctx.getSource()
-        .getExecutor() instanceof Player executor)) {
+                                            .getExecutor() instanceof Player executor)) {
       sender.sendRichMessage("<red>Only players can use this command!");
       return Command.SINGLE_SUCCESS;
     }
@@ -154,13 +154,13 @@ public class ChallengeCmd {
   private static int runInfoLogic(CommandContext<CommandSourceStack> ctx) {
     var sender = ctx.getSource().getSender();
     if (!(sender instanceof Player) || !(ctx.getSource()
-        .getExecutor() instanceof Player executor)) {
+                                            .getExecutor() instanceof Player executor)) {
       sender.sendRichMessage("<red>Only players can use this command!");
       return Command.SINGLE_SUCCESS;
     }
 
     var playerInChallenge = ChallengeManager.getInstance().getPlayersInChallenges()
-        .get(executor.getUniqueId());
+                                            .get(executor.getUniqueId());
     if (playerInChallenge == null) {
       sender.sendRichMessage("<red>You are not partaking in any challenges!");
       return Command.SINGLE_SUCCESS;

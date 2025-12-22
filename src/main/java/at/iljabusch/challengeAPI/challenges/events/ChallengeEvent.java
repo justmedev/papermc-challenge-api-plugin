@@ -6,31 +6,31 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 public abstract class ChallengeEvent extends Event implements Cancellable {
-    private static final HandlerList handlers = new HandlerList();
-    private final Challenge challenge;
-    private boolean cancelled;
+  private static final HandlerList handlers = new HandlerList();
+  private final Challenge challenge;
+  private boolean cancelled;
 
-    public boolean isCancelled() {
-        return cancelled;
-    }
+  public ChallengeEvent(Challenge challenge) {
+    this.challenge = challenge;
+  }
 
-    public void setCancelled(boolean cancel) {
-        cancelled = cancel;
-    }
+  public static HandlerList getHandlerList() {
+    return handlers;
+  }
 
-    public ChallengeEvent(Challenge challenge) {
-        this.challenge = challenge;
-    }
+  public boolean isCancelled() {
+    return cancelled;
+  }
 
-    public Challenge getChallenge() {
-        return challenge;
-    }
+  public void setCancelled(boolean cancel) {
+    cancelled = cancel;
+  }
 
-    public HandlerList getHandlers() {
-        return handlers;
-    }
+  public Challenge getChallenge() {
+    return challenge;
+  }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
+  public HandlerList getHandlers() {
+    return handlers;
+  }
 }

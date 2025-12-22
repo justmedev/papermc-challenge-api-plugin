@@ -6,14 +6,14 @@ import at.iljabusch.challengeAPI.modifiers.Modifier;
 
 
 public class ConfiguredWorldModifier extends Modifier {
-    private final WorldModifierConfig modifierConfig;
+  private final WorldModifierConfig modifierConfig;
 
-    public ConfiguredWorldModifier(Challenge challenge, WorldModifierConfig modifierConfig) {
-        super(challenge);
-        this.modifierConfig = modifierConfig;
+  public ConfiguredWorldModifier(Challenge challenge, WorldModifierConfig modifierConfig) {
+    super(challenge);
+    this.modifierConfig = modifierConfig;
 
-        challenge.registerEvents(new ConfiguredWorldModifierListener(modifierConfig), ChallengeAPI.getPlugin(ChallengeAPI.class));
-    }
+    challenge.registerEvents(new ConfiguredWorldModifierListener(modifierConfig), ChallengeAPI.getPlugin(ChallengeAPI.class));
+  }
 
 
 }

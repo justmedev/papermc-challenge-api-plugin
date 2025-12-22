@@ -10,24 +10,24 @@ import org.bukkit.event.Listener;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ConfiguredWorldModifierListener implements Listener {
-    private final WorldModifierConfig config;
-    private AtomicReference<WorldCreator> worldCreator;
+  private final WorldModifierConfig config;
+  private AtomicReference<WorldCreator> worldCreator;
 
-    public ConfiguredWorldModifierListener(WorldModifierConfig config) {
-        this.config = config;
-    }
+  public ConfiguredWorldModifierListener(WorldModifierConfig config) {
+    this.config = config;
+  }
 
-    @EventHandler
-    public void onChallengeCreated(ChallengeCreatedEvent event){
-       Challenge challenge = event.getChallenge();
+  @EventHandler
+  public void onChallengeCreated(ChallengeCreatedEvent event) {
+    Challenge challenge = event.getChallenge();
 
-       worldCreator = challenge.getOverworldCreator();
-       //TODO: create and register WorldCreator
-    }
+    worldCreator = challenge.getOverworldCreator();
+    //TODO: create and register WorldCreator
+  }
 
-    @EventHandler
-    public void onChallengeWorldCreated(ChallengeWorldCreatedEvent event){
-       //TODO: apply gamerules and other configs to the World
-    }
+  @EventHandler
+  public void onChallengeWorldCreated(ChallengeWorldCreatedEvent event) {
+    //TODO: apply gamerules and other configs to the World
+  }
 
 }

@@ -19,38 +19,38 @@ public class StopwatchModifier extends Modifier {
   public StopwatchModifier(Challenge challenge) {
     super(challenge);
     challenge.registerEvent(
-            ChallengeStartedEvent.class,
-            null,
-            EventPriority.NORMAL,
-            (listener, event) -> {
-              startTask();
-            },
-            ChallengeAPI.getPlugin(ChallengeAPI.class)
-            );
-
-    challenge.registerEvent(
-            ChallengeStartedEvent.class,
-            null,
-            EventPriority.NORMAL,
-            (listener, event) -> {
-              if (task.isCancelled()) {
-                startTask();
-              }
-            },
-            ChallengeAPI.getPlugin(ChallengeAPI.class)
+        ChallengeStartedEvent.class,
+        null,
+        EventPriority.NORMAL,
+        (listener, event) -> {
+          startTask();
+        },
+        ChallengeAPI.getPlugin(ChallengeAPI.class)
     );
 
     challenge.registerEvent(
-            ChallengeStartedEvent.class,
-            null,
-            EventPriority.NORMAL,
-            (listener, event) -> {
-              if (!challenge.getOnlinePlayers().isEmpty()) {
-                return;
-              }
-              task.cancel();
-            },
-            ChallengeAPI.getPlugin(ChallengeAPI.class)
+        ChallengeStartedEvent.class,
+        null,
+        EventPriority.NORMAL,
+        (listener, event) -> {
+          if (task.isCancelled()) {
+            startTask();
+          }
+        },
+        ChallengeAPI.getPlugin(ChallengeAPI.class)
+    );
+
+    challenge.registerEvent(
+        ChallengeStartedEvent.class,
+        null,
+        EventPriority.NORMAL,
+        (listener, event) -> {
+          if (!challenge.getOnlinePlayers().isEmpty()) {
+            return;
+          }
+          task.cancel();
+        },
+        ChallengeAPI.getPlugin(ChallengeAPI.class)
     );
 
   }

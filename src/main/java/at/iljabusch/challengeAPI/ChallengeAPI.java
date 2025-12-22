@@ -19,8 +19,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ChallengeAPI extends JavaPlugin implements Listener {
 
-  private final ChallengeManager state = ChallengeManager.getInstance();
   public static final Material DEFAULT_MATERIAL = Material.DIRT;
+  private final ChallengeManager state = ChallengeManager.getInstance();
 
   @Override
   public void onEnable() {
@@ -47,7 +47,7 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
 
 
     ChallengeManager.getInstance().registerModifier(
-            RegisteredConfiguredWorldModifier.getPresetConfiguredWorldModifier(WorldModifierPresets.SUPERFLAT_DESERT)
+        RegisteredConfiguredWorldModifier.getPresetConfiguredWorldModifier(WorldModifierPresets.SUPERFLAT_DESERT)
     );
 
     getLifecycleManager().registerEventHandler(

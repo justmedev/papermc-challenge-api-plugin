@@ -53,36 +53,15 @@ public class Challenge {
   private final ChallengeWorlds worlds = new ChallengeWorlds();
   private final UUID worldUUID = UUID.randomUUID();
   private final PluginManager pluginManager = plugin.getServer().getPluginManager();
+  private final AtomicReference<WorldCreator> overworldCreator = new AtomicReference<>();
+  private final AtomicReference<WorldCreator> netherCreator = new AtomicReference<>();
+  private final AtomicReference<WorldCreator> endCreator = new AtomicReference<>();
+  private final Set<ChallengeProxyEventExecutor> challengeProxyEventExecutors = new HashSet<>();
   private ChallengeState state;
-  private Set<ChallengeProxyEventExecutor> challengeProxyEventExecutors = new HashSet<>();
   @Setter
   private Set<RegisteredModifier> registeredModifiers;
   @Setter
   private Set<Modifier> modifiers = new HashSet<>();
-
-  private final AtomicReference<WorldCreator> overworldCreator = new AtomicReference<>();
-  private final AtomicReference<WorldCreator> netherCreator = new AtomicReference<>();
-  private final AtomicReference<WorldCreator> endCreator = new AtomicReference<>();
-
-  public boolean setWorldCreator(WorldCreator creator) {
-    switch(creator.environment()) {
-      case NETHER:
-        return setSingleWorldCreator(overworldCreator, creator);
-      case THE_END:
-        return setSingleWorldCreator(netherCreator, creator);
-      case NORMAL:
-        return setSingleWorldCreator(endCreator, creator);
-
-    }
-    return false;
-  }
-  private boolean setSingleWorldCreator(AtomicReference<WorldCreator> ref, WorldCreator creator) {
-    boolean success = ref.compareAndSet(null, creator);
-    if(!success){
-      getLogger().warn("Duplicate WorldMoifiers!\nCannot assign WorldModifier " + creator.environment().name() + " was already set!");
-    }
-    return success;
-  }
 
   public Challenge(Player creator, Set<RegisteredModifier> options) {
     creator.sendRichMessage("<gold>Creating challenge ...");
@@ -95,59 +74,81 @@ public class Challenge {
     //TODO: replace with Bukkit WorldCreators
 
     for (Environment env : List.of(Environment.NORMAL, Environment.NETHER, Environment.THE_END)) {
-      Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-        try {
-            AtomicReference<WorldCreator> ref = switch (env) {
-              case NORMAL -> overworldCreator;
-              case NETHER -> netherCreator;
-              case THE_END -> endCreator;
-              //TODO: support custom worlds created by modifiers or something i dont know sigma sigma boy
+      Bukkit.getScheduler().runTaskAsynchronously(
+          plugin, () -> {
+            try {
+              AtomicReference<WorldCreator> ref = switch (env) {
+                case NORMAL -> overworldCreator;
+                case NETHER -> netherCreator;
+                case THE_END -> endCreator;
+                //TODO: support custom worlds created by modifiers or something i dont know sigma sigma boy
                 case CUSTOM -> null;
-            };
+              };
 
-            WorldCreator worldCreator = ref.get();
-            if (worldCreator == null) {
-              worldCreator = new WorldCreator(WORLD_PREFIX + "_" + worldUUID + "_" + env.name())
-                      .environment(env)
-                      .type(WorldType.NORMAL)
-                      .generateStructures(true);
-              ref.set(worldCreator);
-            } else {
-              worldCreator.name(WORLD_PREFIX + "_" + worldUUID + "_" + env.name());
-            }
+              WorldCreator worldCreator = ref.get();
+              if (worldCreator == null) {
+                worldCreator = new WorldCreator(WORLD_PREFIX + "_" + worldUUID + "_" + env.name())
+                    .environment(env)
+                    .type(WorldType.NORMAL)
+                    .generateStructures(true);
+                ref.set(worldCreator);
+              } else {
+                WorldCreator.name(WORLD_PREFIX + "_" + worldUUID + "_" + env.name());
+              }
 
-          World world = worldCreator.createWorld();
+              World world = worldCreator.createWorld();
 
-          switch (world.getEnvironment()) {
-            case NORMAL -> worlds.setNormal(world);
-            case NETHER -> worlds.setNether(world);
-            case THE_END -> worlds.setTheEnd(world);
-          }
+              switch (world.getEnvironment()) {
+                case NORMAL -> worlds.setNormal(world);
+                case NETHER -> worlds.setNether(world);
+                case THE_END -> worlds.setTheEnd(world);
+              }
 
-          int successes = successCount.getAndIncrement() + 1;
-          if (successes >= 3) {
-            this.state = ChallengeState.READY;
+              int successes = successCount.getAndIncrement() + 1;
+              if (successes >= 3) {
+                this.state = ChallengeState.READY;
 
-            creator.sendRichMessage(
+                creator.sendRichMessage(
                     """
                         <gold>Your challenge was created successfully!
                         Selected modifiers: <dark_red><modifiers></dark_red>
                         Use <dark_red><click:suggest_command:"/challenge invite ">/challenge invite <players></click></dark_red> to invite others to your challenge!
                         Use <dark_red><click:run_command:"/challenge start">/challenge start</click></dark_red> to start the challenge!""",
                     Placeholder.unparsed(
-                            "modifiers",
-                            String.join(", ", registeredModifiers.stream().map(RegisteredModifier::getName).toList())
+                        "modifiers",
+                        String.join(", ", registeredModifiers.stream().map(RegisteredModifier::getName).toList())
                     )
-            );
-          }
+                );
+              }
 
-        } catch (Exception e) {
-          handleWorldCreationFailure(e);
-        }
-      });
+            } catch (Exception e) {
+              handleWorldCreationFailure(e);
+            }
+          }
+      );
     }
   }
 
+  public boolean setWorldCreator(WorldCreator creator) {
+    switch (creator.environment()) {
+      case NETHER:
+        return setSingleWorldCreator(overworldCreator, creator);
+      case THE_END:
+        return setSingleWorldCreator(netherCreator, creator);
+      case NORMAL:
+        return setSingleWorldCreator(endCreator, creator);
+
+    }
+    return false;
+  }
+
+  private boolean setSingleWorldCreator(AtomicReference<WorldCreator> ref, WorldCreator creator) {
+    boolean success = ref.compareAndSet(null, creator);
+    if (!success) {
+      getLogger().warn("Duplicate WorldMoifiers!\nCannot assign WorldModifier " + creator.environment().name() + " was already set!");
+    }
+    return success;
+  }
 
   private Optional<Player> getCreator() {
     return getOnlinePlayers().stream().filter(p -> p.getUniqueId() == creatorUUID).findFirst();
@@ -155,14 +156,15 @@ public class Challenge {
 
   public List<Player> getOnlinePlayers() {
     return playerUUIDs.stream()
-        .map(p -> Bukkit.getServer().getPlayer(p))
-        .filter(Objects::nonNull)
-        .filter(OfflinePlayer::isOnline)
-        .toList();
+                      .map(p -> Bukkit.getServer().getPlayer(p))
+                      .filter(Objects::nonNull)
+                      .filter(OfflinePlayer::isOnline)
+                      .toList();
   }
 
   private void handleWorldCreationFailure(
-          Exception reason) {
+      Exception reason
+  ) {
     getLogger().error("Failed to create world for challenge: {}", reason);
     getCreator().ifPresent(
         player -> player.sendRichMessage("<red>Failed to create challenge!")
@@ -247,10 +249,10 @@ public class Challenge {
   public void leave(Player player) {
     if (playerUUIDs.remove(player.getUniqueId()) && state.isOngoingOrCompleted()) {
       player.teleportAsync(MultiverseCoreApi.get()
-                               .getWorldManager()
-                               .getDefaultWorld()
-                               .getOrNull()
-                               .getSpawnLocation());
+                                            .getWorldManager()
+                                            .getDefaultWorld()
+                                            .getOrNull()
+                                            .getSpawnLocation());
     }
     if (!playerUUIDs.isEmpty()) {
       return;
@@ -302,14 +304,13 @@ public class Challenge {
   }
 
 
-
   /**
    * Registers all the events in the given listener class
    *
    * @param listener Listener to register
-   * @param plugin Plugin to register
+   * @param plugin   Plugin to register
    */
-  public void registerEvents(@NotNull Listener listener, @NotNull Plugin plugin){
+  public void registerEvents(@NotNull Listener listener, @NotNull Plugin plugin) {
     challengeProxyEventExecutors.add(new ChallengeProxyEventExecutor(this, plugin, listener));
 
   }
@@ -317,28 +318,34 @@ public class Challenge {
   /**
    * Registers the specified executor to the given event class
    *
-   * @param event Event type to register
+   * @param event    Event type to register
    * @param listener Listener to register
    * @param priority Priority to register this event at
    * @param executor EventExecutor to register
-   * @param plugin Plugin to register
+   * @param plugin   Plugin to register
    */
-  public void registerEvent(@NotNull Class<? extends Event> event, @NotNull Listener listener, @NotNull EventPriority priority, @NotNull EventExecutor executor, @NotNull Plugin plugin){
+  public void registerEvent(@NotNull Class<? extends Event> event, @NotNull Listener listener, @NotNull EventPriority priority, @NotNull EventExecutor executor, @NotNull Plugin plugin) {
     challengeProxyEventExecutors.add(new ChallengeProxyEventExecutor(event, this, plugin, listener, priority, executor));
   }
 
   /**
    * Registers the specified executor to the given event class
    *
-   * @param event Event type to register
-   * @param listener Listener to register
-   * @param priority Priority to register this event at
-   * @param executor EventExecutor to register
-   * @param plugin Plugin to register
+   * @param event           Event type to register
+   * @param listener        Listener to register
+   * @param priority        Priority to register this event at
+   * @param executor        EventExecutor to register
+   * @param plugin          Plugin to register
    * @param ignoreCancelled Whether to pass cancelled events or not
    */
-  public void registerEvent(@NotNull Class<? extends Event> event, @NotNull Listener listener, @NotNull EventPriority priority, @NotNull EventExecutor executor, @NotNull Plugin plugin, boolean ignoreCancelled)
-  {
+  public void registerEvent(
+      @NotNull Class<? extends Event> event,
+      @NotNull Listener listener,
+      @NotNull EventPriority priority,
+      @NotNull EventExecutor executor,
+      @NotNull Plugin plugin,
+      boolean ignoreCancelled
+  ) {
     challengeProxyEventExecutors.add(new ChallengeProxyEventExecutor(event, this, plugin, listener, priority, executor, ignoreCancelled));
   }
 
