@@ -44,7 +44,7 @@ public class ChallengeCreationMenu implements InventoryHolder {
       var registeredMod = ChallengeManager.getInstance().getRegisteredModifiers().get(i);
       var cmi = new ModifierMenuItem(registeredMod, false);
 
-      if (registeredMod.displayItem() == CREATE_CHALLENGE_MATERIAL) {
+      if (registeredMod.getDisplayItem() == CREATE_CHALLENGE_MATERIAL) {
         getLogger().warn("{} is not allowed for modifiers!", CREATE_CHALLENGE_MATERIAL);
         continue;
       }
