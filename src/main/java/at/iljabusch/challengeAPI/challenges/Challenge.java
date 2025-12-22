@@ -21,7 +21,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.mvplugins.multiverse.core.MultiverseCoreApi;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -237,11 +236,7 @@ public class Challenge {
 
   public void leave(Player player) {
     if (playerUUIDs.remove(player.getUniqueId()) && state.isOngoingOrCompleted()) {
-      player.teleportAsync(MultiverseCoreApi.get()
-                                            .getWorldManager()
-                                            .getDefaultWorld()
-                                            .getOrNull()
-                                            .getSpawnLocation());
+      player.teleportAsync(Bukkit.getWorld("world").getSpawnLocation()); // TODO: dynamic default world name
     }
     if (!playerUUIDs.isEmpty()) {
       return;
