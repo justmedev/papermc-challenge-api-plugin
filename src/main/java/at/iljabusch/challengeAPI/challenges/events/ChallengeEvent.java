@@ -19,11 +19,12 @@ public abstract class ChallengeEvent extends Event implements Cancellable {
     this.challenge = challenge;
   }
 
-  @Override
-  public @NotNull HandlerList getHandlers() {
+  public static HandlerList getHandlerList() {
     return handlers;
   }
-  public static HandlerList getHandlerList() {
+
+  @Override
+  public @NotNull HandlerList getHandlers() {
     return handlers;
   }
 }

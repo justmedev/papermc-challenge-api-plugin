@@ -116,15 +116,15 @@ public class Challenge {
   public AtomicReference<WorldCreator> setWorldCreator(WorldCreator creator) {
     switch (creator.environment()) {
       case NETHER:
-        if(setSingleWorldCreator(overworldCreator, creator)){
+        if (setSingleWorldCreator(overworldCreator, creator)) {
           return overworldCreator;
         }
       case THE_END:
-        if(setSingleWorldCreator(netherCreator, creator)){
-         return netherCreator;
+        if (setSingleWorldCreator(netherCreator, creator)) {
+          return netherCreator;
         }
       case NORMAL:
-        if(setSingleWorldCreator(endCreator, creator)){
+        if (setSingleWorldCreator(endCreator, creator)) {
           return endCreator;
         }
 
@@ -133,7 +133,7 @@ public class Challenge {
   }
 
   private boolean setSingleWorldCreator(AtomicReference<WorldCreator> ref, WorldCreator creator) {
-    if(ref.get() != null){
+    if (ref.get() != null) {
       getLogger().warn("Duplicate WorldMoifiers!\nCannot assign WorldModifier " + creator.environment().name() + " was already set!");
       return false;
     }

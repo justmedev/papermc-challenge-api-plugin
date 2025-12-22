@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +55,8 @@ public class ChallengeProxyEventExecutor implements EventExecutor, Listener {
     );
     registerExecutor();
   }
-  private void registerExecutor(){
+
+  private void registerExecutor() {
     pluginmanager.registerEvent(
         executorInfo.event(),
         this,
@@ -66,7 +66,8 @@ public class ChallengeProxyEventExecutor implements EventExecutor, Listener {
         executorInfo.ignoreCancelled()
     );
   }
-  private void registerUserListener(){
+
+  private void registerUserListener() {
     addUserListenerMethods();
 
     for (Class<? extends Event> event : registeredMethods.keySet()) {
@@ -124,8 +125,8 @@ public class ChallengeProxyEventExecutor implements EventExecutor, Listener {
   }
 
   private boolean isEventAffiliated(@NotNull Event event) {
-    if(event instanceof ChallengeEvent){
-      if(((ChallengeEvent) event).getChallenge().equals(challenge))return true;
+    if (event instanceof ChallengeEvent) {
+      if (((ChallengeEvent) event).getChallenge().equals(challenge)) return true;
     }
     if (event instanceof PlayerEvent) {
       if (challenge.getPlayerUUIDs().contains(((PlayerEvent) event).getPlayer().getUniqueId())) return true;

@@ -9,7 +9,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
-import java.util.stream.Collectors;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
@@ -43,13 +42,6 @@ public class WorldModifierConfig {
   @Builder.Default
   WorldType worldType = WorldType.NORMAL;
 
-
-  public static class WorldModifierConfigBuilder {
-    public WorldModifierConfigBuilder addGamerule(GameRule<?> rule, Object value) {
-      this.gameRules$value.put(rule, value);
-      return this;
-    }
-  }
   /**
    * Returns a preconfigured WorldModfierConfigBuilder Based on the preset for you to configure Use this if you want to change additional Settings otherwise use:
    * RegisteredConfiguredWorldModifier.getPresetConfiguredWorldModifier(WorldModifierPresets preset)
@@ -312,7 +304,6 @@ public class WorldModifierConfig {
     };
   }
 
-
   public static WorldModifierConfigBuilder fromPlugin(Plugin plugin) {
     return fromPlugin(plugin, ChallengeAPI.DEFAULT_MATERIAL);
   }
@@ -346,5 +337,12 @@ public class WorldModifierConfig {
       return null;
     }
     return WorldModifierConfig.builder().chunkGenerator(plugin.getDefaultWorldGenerator(worldName, generatorId));
+  }
+
+  public static class WorldModifierConfigBuilder {
+    public WorldModifierConfigBuilder addGamerule(GameRule<?> rule, Object value) {
+      this.gameRules$value.put(rule, value);
+      return this;
+    }
   }
 }

@@ -4,7 +4,6 @@ import at.iljabusch.challengeAPI.ChallengeAPI;
 import at.iljabusch.challengeAPI.challenges.Challenge;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

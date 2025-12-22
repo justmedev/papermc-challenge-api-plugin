@@ -9,9 +9,11 @@ import java.util.List;
 
 public class SingleBiomeProvider extends BiomeProvider {
   private final Biome biome;
+
   public SingleBiomeProvider(final Biome biome) {
     this.biome = biome;
   }
+
   @Override
   public @NotNull Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
     return this.biome;

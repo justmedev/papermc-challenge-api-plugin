@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 public class ChallengePlayerEvent extends ChallengeEvent {
   private final Player player;
+
   public ChallengePlayerEvent(Challenge challenge, Player player) {
     super(challenge);
     this.player = player;
