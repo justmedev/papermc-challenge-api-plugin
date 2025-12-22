@@ -7,6 +7,7 @@ import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
 import at.iljabusch.challengeAPI.modifiers.stopwatch.StopwatchModifier;
 import at.iljabusch.challengeAPI.modifiers.world.presets.RegisteredConfiguredWorldModifier;
+import at.iljabusch.challengeAPI.modifiers.world.presets.WorldModifierConfig;
 import at.iljabusch.challengeAPI.modifiers.world.presets.WorldModifierPresets;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
@@ -44,7 +45,6 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
             StopwatchModifier.class
         )
     );
-
 
     ChallengeManager.getInstance().registerModifier(
         RegisteredConfiguredWorldModifier.getPresetConfiguredWorldModifier(WorldModifierPresets.SUPERFLAT_DESERT)

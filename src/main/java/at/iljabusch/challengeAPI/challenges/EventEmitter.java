@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class EventEmitter {
-  // TODO: let modifiers add a Listener directly to the challenge to check automatically if an event is associated with a challenge or not
 
   private final @NonNull Challenge challenge;
   private final Set<ChallengeProxyEventExecutor> challengeProxyEventExecutors = new HashSet<>();

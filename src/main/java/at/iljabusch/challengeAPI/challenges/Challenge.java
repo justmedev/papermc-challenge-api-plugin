@@ -113,23 +113,33 @@ public class Challenge {
     );
   }
 
-  public boolean setWorldCreator(WorldCreator creator) {
+  public AtomicReference<WorldCreator> setWorldCreator(WorldCreator creator) {
     switch (creator.environment()) {
       case NETHER:
-        return setSingleWorldCreator(overworldCreator, creator);
+        if(setSingleWorldCreator(overworldCreator, creator)){
+          return overworldCreator;
+        }
       case THE_END:
-        return setSingleWorldCreator(netherCreator, creator);
+        if(setSingleWorldCreator(netherCreator, creator)){
+         return netherCreator;
+        }
       case NORMAL:
-        return setSingleWorldCreator(endCreator, creator);
+        if(setSingleWorldCreator(endCreator, creator)){
+          return endCreator;
+        }
 
     }
-    return false;
+    return null;
   }
 
   private boolean setSingleWorldCreator(AtomicReference<WorldCreator> ref, WorldCreator creator) {
+    if(ref.get() != null){
+      getLogger().warn("Duplicate WorldMoifiers!\nCannot assign WorldModifier " + creator.environment().name() + " was already set!");
+      return false;
+    }
     boolean success = ref.compareAndSet(null, creator);
     if (!success) {
-      getLogger().warn("Duplicate WorldMoifiers!\nCannot assign WorldModifier " + creator.environment().name() + " was already set!");
+      getLogger().warn("Assignment failed unexpectedly for  " + creator.environment().name() + "!");
     }
     return success;
   }

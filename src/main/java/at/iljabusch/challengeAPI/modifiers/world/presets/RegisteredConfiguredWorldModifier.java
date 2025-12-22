@@ -4,8 +4,10 @@ import at.iljabusch.challengeAPI.ChallengeAPI;
 import at.iljabusch.challengeAPI.challenges.Challenge;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.generator.ChunkGenerator;
@@ -19,8 +21,15 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+@NoArgsConstructor
 public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
   WorldModifierConfig config;
+
+  public RegisteredConfiguredWorldModifier(String name, String author, Material material, WorldModifierConfig config) {
+    super(name, author, material, ConfiguredWorldModifier.class);
+    this.config = config;
+  }
+
 
   //TODO: add these to WorldModifierConfig but returning a builder so the use can gor registerModifier(fromPlugin(plugin).envrionment().addGamerule() ...
   public static RegisteredConfiguredWorldModifier fromPlugin(Plugin plugin) {

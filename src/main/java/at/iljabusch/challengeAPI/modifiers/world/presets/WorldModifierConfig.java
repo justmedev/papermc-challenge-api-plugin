@@ -1,12 +1,17 @@
 package at.iljabusch.challengeAPI.modifiers.world.presets;
 
+import at.iljabusch.challengeAPI.ChallengeAPI;
 import lombok.Builder;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.generator.ChunkGenerator;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.stream.Collectors;
+
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 @Builder
 public class WorldModifierConfig {
@@ -18,7 +23,7 @@ public class WorldModifierConfig {
   @Builder.Default
   protected boolean generateStructures = true;
   @Builder.Default
-  protected boolean starterChest = false;
+  protected boolean spawnBonusChest = false;
   @Builder.Default
   protected long seed = 0;
   protected ChunkGenerator chunkGenerator;
@@ -38,6 +43,13 @@ public class WorldModifierConfig {
   @Builder.Default
   WorldType worldType = WorldType.NORMAL;
 
+
+  public static class WorldModifierConfigBuilder {
+    public WorldModifierConfigBuilder addGamerule(GameRule<?> rule, Object value) {
+      this.gameRules$value.put(rule, value);
+      return this;
+    }
+  }
   /**
    * Returns a preconfigured WorldModfierConfigBuilder Based on the preset for you to configure Use this if you want to change additional Settings otherwise use:
    * RegisteredConfiguredWorldModifier.getPresetConfiguredWorldModifier(WorldModifierPresets preset)
@@ -47,7 +59,7 @@ public class WorldModifierConfig {
    */
   public static WorldModifierConfigBuilder getPresetWorldModifierConfig(WorldModifierPresets preset) {
     switch (preset) {
-      case OVERWORLD -> {
+      case OVERWORLD, SINGLE_BIOME -> {
         return WorldModifierConfig.builder();
       }
       case NETHER -> {
@@ -72,10 +84,6 @@ public class WorldModifierConfig {
       case AMPLIFIED -> {
         return WorldModifierConfig.builder()
                                   .worldType(WorldType.AMPLIFIED);
-      }
-      case SINGLE_BIOME -> {
-        // TODO: create SingleBiome ChunkGenerator
-        return WorldModifierConfig.builder();
       }
       case SKY_BLOCK_OVERWORLD -> {
         // TODO: create SkyBlockOverworld ChunkGenerator
@@ -304,8 +312,39 @@ public class WorldModifierConfig {
     };
   }
 
-  public <T> WorldModifierConfig addGamerule(GameRule<T> rule, T value) {
-    gameRules.put(rule, value);
-    return this;
+
+  public static WorldModifierConfigBuilder fromPlugin(Plugin plugin) {
+    return fromPlugin(plugin, ChallengeAPI.DEFAULT_MATERIAL);
+  }
+
+  public static WorldModifierConfigBuilder fromPlugin(String name) {
+    return fromPlugin(name, ChallengeAPI.DEFAULT_MATERIAL, "world", null);
+  }
+
+  public static WorldModifierConfigBuilder fromPlugin(String name, Material material) {
+    return fromPlugin(name, material, "world", null);
+  }
+
+  public static WorldModifierConfigBuilder fromPlugin(String name, Material material, String worldName, String generatorId) {
+    Plugin plugin = Bukkit.getPluginManager().getPlugin(name);
+    if (plugin == null) {
+      getLogger().warn("Plugin '{}' not found! Could not register!", name);
+      return null;
+    }
+    return fromPlugin(plugin, material, worldName, generatorId);
+  }
+
+  public static WorldModifierConfigBuilder fromPlugin(Plugin plugin, Material material) {
+    return fromPlugin(plugin, material, "world", null);
+  }
+
+  public static WorldModifierConfigBuilder fromPlugin(Plugin plugin, Material material, String worldName, String generatorId) {
+    try {
+      plugin.getClass().getMethod("getDefaultWorldGenerator", String.class, String.class);
+    } catch (NoSuchMethodException e) {
+      getLogger().warn("Plugin '{}' does not seem to define a default world generator!", plugin.getName());
+      return null;
+    }
+    return WorldModifierConfig.builder().chunkGenerator(plugin.getDefaultWorldGenerator(worldName, generatorId));
   }
 }
