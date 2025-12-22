@@ -44,7 +44,6 @@ public class Challenge {
   private final AtomicReference<WorldCreator> overworldCreator = new AtomicReference<>();
   private final AtomicReference<WorldCreator> netherCreator = new AtomicReference<>();
   private final AtomicReference<WorldCreator> endCreator = new AtomicReference<>();
-  @Getter
   private final EventEmitter eventEmitter = new EventEmitter(this);
   private ChallengeState state;
   @Setter
@@ -59,63 +58,59 @@ public class Challenge {
     this.creatorUUID = creator.getUniqueId();
     this.playerUUIDs.add(this.creatorUUID);
 
-    AtomicInteger successCount = new AtomicInteger();
-    //TODO: replace with Bukkit WorldCreators
-
+    var success = true;
     for (Environment env : List.of(Environment.NORMAL, Environment.NETHER, Environment.THE_END)) {
-      Bukkit.getScheduler().runTaskAsynchronously(
-          plugin, () -> {
-            try {
-              AtomicReference<WorldCreator> ref = switch (env) {
-                case NORMAL -> overworldCreator;
-                case NETHER -> netherCreator;
-                case THE_END -> endCreator;
-                //TODO: support custom worlds created by modifiers or something i dont know sigma sigma boy
-                case CUSTOM -> null;
-              };
+      try {
+        AtomicReference<WorldCreator> ref = switch (env) {
+          case NORMAL -> overworldCreator;
+          case NETHER -> netherCreator;
+          case THE_END -> endCreator;
+          //TODO: support custom worlds created by modifiers or something i dont know sigma sigma boy
+          case CUSTOM -> null;
+        };
 
-              WorldCreator worldCreator = ref.get();
-              if (worldCreator == null) {
-                worldCreator = new WorldCreator(WORLD_PREFIX + "_" + worldUUID + "_" + env.name())
-                    .environment(env)
-                    .type(WorldType.NORMAL)
-                    .generateStructures(true);
-                ref.set(worldCreator);
-              } else {
-                WorldCreator.name(WORLD_PREFIX + "_" + worldUUID + "_" + env.name());
-              }
+        WorldCreator worldCreator = ref.get();
+        if (worldCreator == null) {
+          worldCreator = new WorldCreator(WORLD_PREFIX + "_" + worldUUID + "_" + env.name())
+              .environment(env)
+              .type(WorldType.NORMAL)
+              .generateStructures(true);
+          ref.set(worldCreator);
+        } else {
+          WorldCreator.name(WORLD_PREFIX + "_" + worldUUID + "_" + env.name());
+        }
 
-              World world = worldCreator.createWorld();
+        World world = worldCreator.createWorld();
 
-              switch (world.getEnvironment()) {
-                case NORMAL -> worlds.setNormal(world);
-                case NETHER -> worlds.setNether(world);
-                case THE_END -> worlds.setTheEnd(world);
-              }
-
-              int successes = successCount.getAndIncrement() + 1;
-              if (successes >= 3) {
-                this.state = ChallengeState.READY;
-
-                creator.sendRichMessage(
-                    """
-                        <gold>Your challenge was created successfully!
-                        Selected modifiers: <dark_red><modifiers></dark_red>
-                        Use <dark_red><click:suggest_command:"/challenge invite ">/challenge invite <players></click></dark_red> to invite others to your challenge!
-                        Use <dark_red><click:run_command:"/challenge start">/challenge start</click></dark_red> to start the challenge!""",
-                    Placeholder.unparsed(
-                        "modifiers",
-                        String.join(", ", registeredModifiers.stream().map(RegisteredModifier::getName).toList())
-                    )
-                );
-              }
-
-            } catch (Exception e) {
-              handleWorldCreationFailure(e);
-            }
-          }
-      );
+        switch (world.getEnvironment()) {
+          case NORMAL -> worlds.setNormal(world);
+          case NETHER -> worlds.setNether(world);
+          case THE_END -> worlds.setTheEnd(world);
+        }
+      } catch (Exception reason) {
+        getLogger().error("Failed to create world for challenge", reason);
+        getCreator().ifPresent(
+            player -> player.sendRichMessage("<red>Failed to create challenge!")
+        );
+        getOnlinePlayers().forEach(this::leave);
+        success = false;
+      }
     }
+
+    if (!success) return;
+    this.state = ChallengeState.READY;
+
+    creator.sendRichMessage(
+        """
+            <gold>Your challenge was created successfully!
+            Selected modifiers: <dark_red><modifiers></dark_red>
+            Use <dark_red><click:suggest_command:"/challenge invite ">/challenge invite <players></click></dark_red> to invite others to your challenge!
+            Use <dark_red><click:run_command:"/challenge start">/challenge start</click></dark_red> to start the challenge!""",
+        Placeholder.unparsed(
+            "modifiers",
+            String.join(", ", registeredModifiers.stream().map(RegisteredModifier::getName).toList())
+        )
+    );
   }
 
   public boolean setWorldCreator(WorldCreator creator) {
@@ -149,16 +144,6 @@ public class Challenge {
                       .filter(Objects::nonNull)
                       .filter(OfflinePlayer::isOnline)
                       .toList();
-  }
-
-  private void handleWorldCreationFailure(
-      Exception reason
-  ) {
-    getLogger().error("Failed to create world for challenge", reason);
-    getCreator().ifPresent(
-        player -> player.sendRichMessage("<red>Failed to create challenge!")
-    );
-    getOnlinePlayers().forEach(this::leave);
   }
 
   public void start() {
