@@ -36,16 +36,14 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
             SharedHealthModifier.class
         )
     );
-    for (int i = 0; i < 7 * 6 + 4; i++) {
-      ChallengeManager.getInstance().registerModifier(
-          new RegisteredModifier(
-              "Stopwatch",
-              "Ilja Busch",
-              Material.CLOCK,
-              StopwatchModifier.class
-          )
-      );
-    }
+    ChallengeManager.getInstance().registerModifier(
+        new RegisteredModifier(
+            "Stopwatch",
+            "Ilja Busch",
+            Material.CLOCK,
+            StopwatchModifier.class
+        )
+    );
 
 
     ChallengeManager.getInstance().registerModifier(
