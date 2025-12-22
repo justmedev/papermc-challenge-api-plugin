@@ -1,13 +1,9 @@
 package at.iljabusch.challengeAPI.menus.createchallenge;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
 import at.iljabusch.challengeAPI.ChallengeAPI;
 import at.iljabusch.challengeAPI.ChallengeManager;
 import at.iljabusch.challengeAPI.menus.InventoryPager;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 import lombok.Getter;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -16,6 +12,12 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.NonNull;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 public class ChallengeCreationMenu implements InventoryHolder {
 
@@ -70,13 +72,13 @@ public class ChallengeCreationMenu implements InventoryHolder {
 
   public @NonNull Collection<RegisteredModifier> getActiveModifiers() {
     return inventoryPager.getPages().stream()
-        .map(page -> page
-            .values()
-            .stream()
-            .filter(ModifierMenuItem::isActive)
-            .map(ModifierMenuItem::getMod)
-            .toList())
-        .flatMap(List::stream)
-        .toList();
+                         .map(page -> page
+                             .values()
+                             .stream()
+                             .filter(ModifierMenuItem::isActive)
+                             .map(ModifierMenuItem::getMod)
+                             .toList())
+                         .flatMap(List::stream)
+                         .toList();
   }
 }

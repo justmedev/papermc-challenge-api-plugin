@@ -1,12 +1,13 @@
 package at.iljabusch.challengeAPI;
 
-import java.util.Iterator;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.advancement.AdvancementProgress;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Iterator;
 
 public class Utils {
 

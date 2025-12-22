@@ -1,15 +1,15 @@
 package at.iljabusch.challengeAPI.menus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 /**
- * A paged inventory is an inventory with pages. It works using pagedSections, so you can partially
- * page an inventory (for example left half is paged, right half has static functions)
+ * A paged inventory is an inventory with pages. It works using pagedSections, so you can partially page an inventory (for example left half is paged, right half has static functions)
  */
 @Getter
 public class InventoryPager<ITEM extends InventoryItem> {
@@ -44,8 +44,7 @@ public class InventoryPager<ITEM extends InventoryItem> {
    *
    * @param cols amount of columns from the left
    * @param rows amount of rows from the top
-   * @throws InventoryDimensionException when the cols/rows are larger than the inventories
-   *                                     cols/rows
+   * @throws InventoryDimensionException when the cols/rows are larger than the inventories cols/rows
    */
   public void setPagedSectionDimensions(int cols, int rows) throws InventoryDimensionException {
     if (cols > 9 || rows > inventoryHolder.getInventory().getSize() / 9) {
@@ -77,8 +76,7 @@ public class InventoryPager<ITEM extends InventoryItem> {
   }
 
   /**
-   * Convert a global (non-sectionized) index to a sectionized index (an index, that skips reserved
-   * spaces)
+   * Convert a global (non-sectionized) index to a sectionized index (an index, that skips reserved spaces)
    *
    * @param globalIndex the non-sectioned index
    * @return index, that skips spaces not allowed in {@link #pagedSectionCols}

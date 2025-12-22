@@ -25,7 +25,7 @@ public class ModifierMenuItem implements InventoryItem {
         mod.name(),
         Component.text(mod.author()),
         isActive ? Component.text("[Enabled]", NamedTextColor.GREEN)
-            : Component.text("[Disabled]", NamedTextColor.RED)
+                 : Component.text("[Disabled]", NamedTextColor.RED)
     );
   }
 }

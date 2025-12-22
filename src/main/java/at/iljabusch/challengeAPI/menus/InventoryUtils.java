@@ -1,11 +1,12 @@
 package at.iljabusch.challengeAPI.menus;
 
 import com.destroystokyo.paper.profile.ProfileProperty;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+
+import java.util.UUID;
 
 public class InventoryUtils {
 
