@@ -113,194 +113,131 @@ public class WorldModifierConfig {
   public static @NonNull String getDefaultGeneratorSettings(@NonNull WorldModifierPresets preset) {
     return switch (preset) {
       case SUPERFLAT_DEFAULT -> """
-          {
-            "biome": "minecraft:plains",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:dirt",
-                "height": 3
-              },
-              {
-                "block": "minecraft:grass_block",
-                "height": 1
-              }
-            ],
-            "structures": {
-              "village": true
-            },
-            "features": true
-          }
-          """;
+            {
+              "biome": "minecraft:plains",
+              "layers": [
+                { "block": "minecraft:bedrock", "height": 1 },
+                { "block": "minecraft:dirt", "height": 3 },
+                { "block": "minecraft:grass_block", "height": 1 }
+              ],
+              "structure_overrides": [
+                "minecraft:villages",
+                "minecraft:strongholds"
+              ],
+              "features": false
+            }
+            """;
 
       case SUPERFLAT_TUNNELERS_DREAM -> """
-          {
-            "biome": "minecraft:mountain_edge",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:stone",
-                "height": 5
-              },
-              {
-                "block": "minecraft:dirt",
-                "height": 3
-              },
-              {
-                "block": "minecraft:grass_block",
-                "height": 1
-              }
-            ],
-            "structures": {
-              "village": true,
-              "mineshaft": {
-                "chance": 1.0
-              }
-            },
-            "features": true
-          }
-          """;
+            {
+              "biome": "minecraft:mountain_edge",
+              "layers": [
+                { "block": "minecraft:bedrock", "height": 1 },
+                { "block": "minecraft:stone", "height": 5 },
+                { "block": "minecraft:dirt", "height": 3 },
+                { "block": "minecraft:grass_block", "height": 1 }
+              ],
+              "structure_overrides": [
+                "minecraft:villages",
+                "minecraft:strongholds"
+              ],
+              "features": true
+            }
+            """;
 
       case SUPERFLAT_WATER_WORLD -> """
-          {
-            "biome": "minecraft:plains",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:water",
-                "height": 90
-              }
-            ],
-            "structures": {},
-            "features": false
-          }
-          """;
+            {
+              "biome": "minecraft:plains",
+              "layers": [
+                { "block": "minecraft:bedrock", "height": 1 },
+                { "block": "minecraft:water", "height": 90 }
+              ],
+              "structure_overrides": [],
+              "features": false
+            }
+            """;
 
       case SUPERFLAT_OVERWORLD -> """
-          {
-            "biome": "minecraft:plains",
-            "layers": [
-              {
-                "block": "minecraft:air",
-                "height": 1
-              },
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              }
-            ],
-            "structures": {
-              "village": true,
-              "stronghold": true,
-              "mineshaft": true,
-              "dungeon": true
-            },
-            "features": true
-          }
-          """;
+            {
+              "biome": "minecraft:plains",
+              "layers": [
+                { "block": "minecraft:air", "height": 1 },
+                { "block": "minecraft:bedrock", "height": 1 }
+              ],
+              "structure_overrides": [
+                "minecraft:villages",
+                "minecraft:strongholds",
+                "minecraft:mineshafts",
+                "minecraft:pillager_outposts"
+              ],
+              "features": true
+            }
+            """;
 
       case SUPERFLAT_SNOWY_KINGDOM -> """
-          {
-            "biome": "minecraft:snowy_plains",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:snow_block",
-                "height": 3
-              },
-              {
-                "block": "minecraft:snow",
-                "height": 1
-              }
-            ],
-            "structures": {
-              "village": true
-            },
-            "features": true
-          }
-          """;
+            {
+              "biome": "minecraft:snowy_plains",
+              "layers": [
+                { "block": "minecraft:bedrock", "height": 1 },
+                { "block": "minecraft:snow_block", "height": 3 },
+                { "block": "minecraft:snow", "height": 1 }
+              ],
+              "structure_overrides": [
+                "minecraft:villages"
+              ],
+              "features": true
+            }
+            """;
 
       case SUPERFLAT_BOTTOMLESS_PIT -> """
-          {
-            "biome": "minecraft:plains",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:air",
-                "height": 64
-              }
-            ],
-            "structures": {},
-            "features": false
-          }
-          """;
+            {
+              "biome": "minecraft:plains",
+              "layers": [
+                { "block": "minecraft:bedrock", "height": 1 },
+                { "block": "minecraft:air", "height": 64 }
+              ],
+              "structure_overrides": [],
+              "features": false
+            }
+            """;
 
       case SUPERFLAT_DESERT -> """
-          {
-            "biome": "minecraft:desert",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:sand",
-                "height": 3
-              },
-              {
-                "block": "minecraft:sandstone",
-                "height": 1
-              }
-            ],
-            "structures": {
-              "village": true,
-              "desert_pyramid": true
-            },
-            "features": true
-          }
-          """;
+            {
+              "biome": "minecraft:desert",
+              "layers": [
+                { "block": "minecraft:bedrock", "height": 1 },
+                { "block": "minecraft:sand", "height": 3 },
+                { "block": "minecraft:sandstone", "height": 1 }
+              ],
+              "structure_overrides": [
+                "minecraft:villages",
+                "minecraft:desert_pyramids"
+              ],
+              "features": true
+            }
+            """;
 
       case SUPERFLAT_REDSTONE_READY -> """
-          {
-            "biome": "minecraft:bedrock",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              }
-            ],
-            "structures": {},
-            "features": false
-          }
-          """;
+            {
+              "biome": "minecraft:plains",
+              "layers": [
+                { "block": "minecraft:bedrock", "height": 52 }
+              ],
+              "structure_overrides": [],
+              "features": false
+            }
+            """;
 
       case SUPERFLAT_THE_VOID -> """
-          {
-            "biome": "minecraft:the_void",
-            "layers": [],
-            "structures": {},
-            "features": false
-          }
-          """;
+            {
+              "biome": "minecraft:the_void",
+              "layers": [
+                { "block": "minecraft:air", "height": 1 }
+              ],
+              "structure_overrides": [],
+              "features": false
+            }
+            """;
 
       default -> "{}";
     };

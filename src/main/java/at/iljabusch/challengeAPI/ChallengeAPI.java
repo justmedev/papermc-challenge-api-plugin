@@ -7,10 +7,13 @@ import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
 import at.iljabusch.challengeAPI.modifiers.stopwatch.StopwatchModifier;
 import at.iljabusch.challengeAPI.modifiers.world.presets.RegisteredConfiguredWorldModifier;
+import at.iljabusch.challengeAPI.modifiers.world.presets.WorldModifierConfig;
 import at.iljabusch.challengeAPI.modifiers.world.presets.WorldModifierPresets;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -28,6 +31,11 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
     getLogger().info("ChallengeAPI Plugin is starting ...");
     Bukkit.getPluginManager().registerEvents(this, this);
     Bukkit.getPluginManager().registerEvents(new ChallengeCreationMenuListener(), this);
+
+    WorldCreator wc = new WorldCreator("test");
+    wc.type(WorldType.FLAT);
+    wc.generatorSettings(WorldModifierConfig.getDefaultGeneratorSettings(WorldModifierPresets.SUPERFLAT_DEFAULT));
+    wc.createWorld();
 
     ChallengeManager.getInstance().registerModifier(
         new RegisteredModifier(
