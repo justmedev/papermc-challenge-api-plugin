@@ -6,6 +6,8 @@ import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerLeaveEvent;
 import at.iljabusch.challengeAPI.challenges.events.ChallengeStartedEvent;
 import at.iljabusch.challengeAPI.modifiers.Modifier;
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
+import at.iljabusch.challengeAPI.modifiers.portal_link.PortalLinkListener;
+import at.iljabusch.challengeAPI.modifiers.portal_link.PortalLinkModifier;
 import lombok.Getter;
 import lombok.Setter;
 import net.kyori.adventure.text.Component;
@@ -53,9 +55,9 @@ public class Challenge {
   @Setter
   private @NonNull Set<Modifier> modifiers = new HashSet<>();
 
-  public Challenge(@NonNull Player creator, Set<RegisteredModifier> options) {
+  public Challenge(@NonNull Player creator, Set<RegisteredModifier> modifiers) {
     creator.sendRichMessage("<gold>Creating challenge ...");
-    this.registeredModifiers = options;
+    this.registeredModifiers = modifiers;
 
     this.creatorUUID = creator.getUniqueId();
     this.playerUUIDs.add(this.creatorUUID);
@@ -167,6 +169,7 @@ public class Challenge {
     }
 
     this.state = ChallengeState.ONGOING;
+    this.modifiers.add(new PortalLinkModifier(this));
     this.registeredModifiers.forEach(registered -> {
       try {
         modifiers.add(registered.createModifierInstance(this));
