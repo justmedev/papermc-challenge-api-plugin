@@ -116,15 +116,18 @@ public class WorldModifierConfig {
             {
               "biome": "minecraft:plains",
               "layers": [
-                { "block": "minecraft:bedrock", "height": 1 },
-                { "block": "minecraft:dirt", "height": 3 },
-                { "block": "minecraft:grass_block", "height": 1 }
+
               ],
               "structure_overrides": [
-                "minecraft:villages",
-                "minecraft:strongholds"
+              {
+                "structures": [
+                  {"structure" :  "minecraft:village_plains", "weight" : 1},
+                  {"structure" :  "minecraft:stronghold", "weight" : 1}
+                ]
+              }
               ],
-              "features": false
+              "features": false,
+              "lakes" : true
             }
             """;
 

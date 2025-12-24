@@ -32,7 +32,6 @@ public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
   }
 
 
-  //TODO: add these to WorldModifierConfig but returning a builder so the use can gor registerModifier(fromPlugin(plugin).envrionment().addGamerule() ...
   public static RegisteredConfiguredWorldModifier fromPlugin(@NonNull Plugin plugin) {
     return fromPlugin(plugin, ChallengeAPI.DEFAULT_MATERIAL);
   }
@@ -118,6 +117,4 @@ public class RegisteredConfiguredWorldModifier extends RegisteredModifier {
     }
     return null;
   }
-
-
 }

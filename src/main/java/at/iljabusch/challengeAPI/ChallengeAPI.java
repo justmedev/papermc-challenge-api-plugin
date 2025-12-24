@@ -6,6 +6,7 @@ import at.iljabusch.challengeAPI.menus.createchallenge.ChallengeCreationMenuList
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
 import at.iljabusch.challengeAPI.modifiers.stopwatch.StopwatchModifier;
+import at.iljabusch.challengeAPI.modifiers.world.presets.FlatGeneratorSettings;
 import at.iljabusch.challengeAPI.modifiers.world.presets.RegisteredConfiguredWorldModifier;
 import at.iljabusch.challengeAPI.modifiers.world.presets.WorldModifierConfig;
 import at.iljabusch.challengeAPI.modifiers.world.presets.WorldModifierPresets;
@@ -14,6 +15,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
+import org.bukkit.block.Biome;
+import org.bukkit.block.BlockType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -32,10 +35,15 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
     Bukkit.getPluginManager().registerEvents(this, this);
     Bukkit.getPluginManager().registerEvents(new ChallengeCreationMenuListener(), this);
 
-    WorldCreator wc = new WorldCreator("test");
-    wc.type(WorldType.FLAT);
-    wc.generatorSettings(WorldModifierConfig.getDefaultGeneratorSettings(WorldModifierPresets.SUPERFLAT_DEFAULT));
-    wc.createWorld();
+    WorldCreator creator = new WorldCreator("test");
+    creator.type(WorldType.FLAT);
+    creator.generatorSettings(WorldModifierConfig.getDefaultGeneratorSettings(WorldModifierPresets.SUPERFLAT_DEFAULT));
+    creator.createWorld();
+    //for (WorldModifierPresets preset : WorldModifierPresets.values()) {
+    //  ChallengeManager.getInstance().registerModifier(
+    //      RegisteredConfiguredWorldModifier.getPresetConfiguredWorldModifier(preset)
+    //  );
+    //}
 
     ChallengeManager.getInstance().registerModifier(
         new RegisteredModifier(
@@ -45,6 +53,8 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
             SharedHealthModifier.class
         )
     );
+
+
     ChallengeManager.getInstance().registerModifier(
         new RegisteredModifier(
             "Stopwatch",
