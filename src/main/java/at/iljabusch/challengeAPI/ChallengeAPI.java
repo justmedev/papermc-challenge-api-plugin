@@ -6,10 +6,7 @@ import at.iljabusch.challengeAPI.menus.createchallenge.ChallengeCreationMenuList
 import at.iljabusch.challengeAPI.modifiers.RegisteredModifier;
 import at.iljabusch.challengeAPI.modifiers.sharedhealth.SharedHealthModifier;
 import at.iljabusch.challengeAPI.modifiers.stopwatch.StopwatchModifier;
-import at.iljabusch.challengeAPI.modifiers.world.presets.FlatGeneratorSettings;
-import at.iljabusch.challengeAPI.modifiers.world.presets.RegisteredConfiguredWorldModifier;
-import at.iljabusch.challengeAPI.modifiers.world.presets.WorldModifierConfig;
-import at.iljabusch.challengeAPI.modifiers.world.presets.WorldModifierPresets;
+import at.iljabusch.challengeAPI.modifiers.world.presets.*;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -35,9 +32,21 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
     Bukkit.getPluginManager().registerEvents(this, this);
     Bukkit.getPluginManager().registerEvents(new ChallengeCreationMenuListener(), this);
 
+
+    FlatGeneratorSettings settings =  FlatGeneratorSettings.builder()
+                                                           .features(true)
+                                                           .lakes(true)
+                                                           .biome(Biome.DARK_FOREST)
+                                                           .addStructure("minecraft:woodland_mansions")
+                                                           .addStructure("minecraft:strongholds")
+                                                           .addBlockLayer(BlockType.BEDROCK, 1)
+                                                           .addBlockLayer(BlockType.GREEN_TERRACOTTA, 200)
+                                                           .build();
+
+    String json = settings.getJson();
     WorldCreator creator = new WorldCreator("test");
     creator.type(WorldType.FLAT);
-    creator.generatorSettings(WorldModifierConfig.getDefaultGeneratorSettings(WorldModifierPresets.SUPERFLAT_DEFAULT));
+    creator.generatorSettings(json);
     creator.createWorld();
     //for (WorldModifierPresets preset : WorldModifierPresets.values()) {
     //  ChallengeManager.getInstance().registerModifier(
@@ -55,6 +64,7 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
     );
 
 
+
     ChallengeManager.getInstance().registerModifier(
         new RegisteredModifier(
             "Stopwatch",
@@ -66,6 +76,42 @@ public final class ChallengeAPI extends JavaPlugin implements Listener {
 
     ChallengeManager.getInstance().registerModifier(
         RegisteredConfiguredWorldModifier.getPresetConfiguredWorldModifier(WorldModifierPresets.SUPERFLAT_DESERT)
+    );
+
+    ChallengeManager.getInstance().registerModifier(
+        new RegisteredConfiguredWorldModifier(
+            "skibedi" ,
+            "dop",
+            Material.AZALEA,
+            WorldModifierConfig.builder()
+                               .worldType(WorldType.FLAT)
+                               .generatorSettings(
+                                   WorldModifierConfig.getDefaultGeneratorSettings(WorldModifierPresets.SUPERFLAT_WATER_WORLD)
+                                       .addStructure("minecraft:strongholds")
+                                       .build()
+                               ).build()
+        ));
+
+    ChallengeManager.getInstance().registerModifier(
+        new RegisteredConfiguredWorldModifier(
+            "skibedi" ,
+            "dop",
+            Material.SLIME_BLOCK,
+            WorldModifierConfig.builder()
+                .worldType(WorldType.FLAT)
+                .generatorSettings(
+                    FlatGeneratorSettings.builder()
+                        .features(true)
+                        .lakes(true)
+                        .biome(Biome.BADLANDS)
+                        .addStructure("woodland_mansions")
+                        .addStructure("minecraft:strongholds")
+                        .addBlockLayer(BlockType.BEDROCK, 200)
+                        .addBlockLayer(BlockType.GREEN_TERRACOTTA, 200)
+                               .build()
+                ).build()
+
+        )
     );
 
     getLifecycleManager().registerEventHandler(
