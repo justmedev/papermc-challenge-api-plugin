@@ -62,6 +62,9 @@ public class Challenge {
     this.creatorUUID = creator.getUniqueId();
     this.playerUUIDs.add(this.creatorUUID);
 
+
+
+
     var success = true;
     for (Environment env : List.of(Environment.NORMAL, Environment.NETHER, Environment.THE_END)) {
       try {
@@ -169,6 +172,8 @@ public class Challenge {
     }
 
     this.state = ChallengeState.ONGOING;
+
+
     this.modifiers.add(new PortalLinkModifier(this));
     this.registeredModifiers.forEach(registered -> {
       try {

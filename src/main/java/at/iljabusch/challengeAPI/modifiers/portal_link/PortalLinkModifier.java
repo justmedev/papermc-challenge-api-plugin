@@ -8,7 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * This is a Modifier that gets added to every challenge by default and cannot be registered.
- * Any challenge that disables portals or has some custom logic relating to portals can unregister it in its Constructor.
+ * Any modifier that disables portals or has some custom logic relating to portals can unregister it in its Constructor.
  */
 public class PortalLinkModifier extends Modifier {
 
