@@ -1,6 +1,7 @@
 package at.iljabusch.challengeAPI.challenges;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
+import at.iljabusch.challengeAPI.challenges.events.ChallengeCreatedEvent;
 import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerJoinEvent;
 import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerLeaveEvent;
 import at.iljabusch.challengeAPI.challenges.events.ChallengeStartedEvent;
@@ -60,46 +61,8 @@ public class Challenge {
     this.creatorUUID = creator.getUniqueId();
     this.playerUUIDs.add(this.creatorUUID);
 
-    var success = true;
-    for (Environment env : List.of(Environment.NORMAL, Environment.NETHER, Environment.THE_END)) {
-      try {
-        AtomicReference<WorldCreator> ref = switch (env) {
-          case NORMAL -> overworldCreator;
-          case NETHER -> netherCreator;
-          case THE_END -> endCreator;
-          //TODO: support custom worlds created by modifiers or something i dont know sigma sigma boy
-          case CUSTOM -> null;
-        };
+    pluginManager.callEvent(new ChallengeCreatedEvent(this));
 
-        WorldCreator worldCreator = ref.get();
-        if (worldCreator == null) {
-          worldCreator = new WorldCreator(WORLD_PREFIX + "_" + worldUUID + "_" + env.name())
-              .environment(env)
-              .type(WorldType.NORMAL)
-              .generateStructures(true);
-          ref.set(worldCreator);
-        } else {
-          WorldCreator.name(WORLD_PREFIX + "_" + worldUUID + "_" + env.name());
-        }
-
-        World world = worldCreator.createWorld();
-
-        switch (world.getEnvironment()) {
-          case NORMAL -> worlds.setNormal(world);
-          case NETHER -> worlds.setNether(world);
-          case THE_END -> worlds.setTheEnd(world);
-        }
-      } catch (Exception reason) {
-        getLogger().error("Failed to create world for challenge", reason);
-        getCreator().ifPresent(
-            player -> player.sendRichMessage("<red>Failed to create challenge!")
-        );
-        getOnlinePlayers().forEach(this::leave);
-        success = false;
-      }
-    }
-
-    if (!success) return;
     this.state = ChallengeState.READY;
 
     creator.sendRichMessage(
@@ -176,6 +139,48 @@ public class Challenge {
         getLogger().error(e);
       }
     });
+
+
+    var worldCreationSuccess = true;
+    for (Environment env : List.of(Environment.NORMAL, Environment.NETHER, Environment.THE_END)) {
+      try {
+        AtomicReference<WorldCreator> ref = switch (env) {
+          case NORMAL -> overworldCreator;
+          case NETHER -> netherCreator;
+          case THE_END -> endCreator;
+          //TODO: support custom worlds created by modifiers or something i dont know sigma sigma boy
+          case CUSTOM -> null;
+        };
+
+        WorldCreator worldCreator = ref.get();
+        if (worldCreator == null) {
+          worldCreator = new WorldCreator(WORLD_PREFIX + "_" + worldUUID + "_" + env.name())
+              .environment(env)
+              .type(WorldType.NORMAL)
+              .generateStructures(true);
+          ref.set(worldCreator);
+        } else {
+          WorldCreator.name(WORLD_PREFIX + "_" + worldUUID + "_" + env.name());
+        }
+
+        World world = worldCreator.createWorld();
+
+        switch (world.getEnvironment()) {
+          case NORMAL -> worlds.setNormal(world);
+          case NETHER -> worlds.setNether(world);
+          case THE_END -> worlds.setTheEnd(world);
+        }
+      } catch (Exception reason) {
+        getLogger().error("Failed to create world for challenge", reason);
+        getCreator().ifPresent(
+            player -> player.sendRichMessage("<red>Failed to create challenge!")
+        );
+        getOnlinePlayers().forEach(this::leave);
+        worldCreationSuccess = false;
+      }
+    }
+
+    if (!worldCreationSuccess) return;
 
     AtomicInteger successCount = new AtomicInteger();
     getOnlinePlayers().forEach(p -> {

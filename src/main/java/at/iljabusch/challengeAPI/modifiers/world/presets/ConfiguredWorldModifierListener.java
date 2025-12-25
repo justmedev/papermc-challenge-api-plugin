@@ -1,5 +1,6 @@
 package at.iljabusch.challengeAPI.modifiers.world.presets;
 
+import at.iljabusch.challengeAPI.challenges.Challenge;
 import at.iljabusch.challengeAPI.challenges.events.ChallengeCreatedEvent;
 import at.iljabusch.challengeAPI.challenges.events.ChallengeWorldCreatedEvent;
 import at.iljabusch.challengeAPI.modifiers.world.presets.chunk_generators.SingleBiomeProvider;
@@ -14,12 +15,13 @@ public class ConfiguredWorldModifierListener implements Listener {
   private final WorldModifierConfig config;
   private AtomicReference<WorldCreator> worldCreator;
 
-  public ConfiguredWorldModifierListener(WorldModifierConfig config) {
+  public ConfiguredWorldModifierListener(WorldModifierConfig config, Challenge challenge) {
     this.config = config;
+
+    assignConfiguredWorldCreator(challenge);
   }
 
-  @EventHandler
-  public void onChallengeCreated(@NonNull ChallengeCreatedEvent event) {
+  private void assignConfiguredWorldCreator(Challenge challenge) {
     WorldCreator configuredWorldCreator = new WorldCreator("temp");
     configuredWorldCreator.type(config.worldType);
     if (config.singleBiomeWorldBiome != null) {
@@ -34,7 +36,7 @@ public class ConfiguredWorldModifierListener implements Listener {
 
     configuredWorldCreator.environment(config.environment);
     configuredWorldCreator.generateStructures(config.generateStructures);
-    worldCreator = event.getChallenge().setWorldCreator(configuredWorldCreator);
+    worldCreator = challenge.setWorldCreator(configuredWorldCreator);
 
   }
 
