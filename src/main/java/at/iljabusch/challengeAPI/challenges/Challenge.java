@@ -1,6 +1,7 @@
 package at.iljabusch.challengeAPI.challenges;
 
 import at.iljabusch.challengeAPI.ChallengeAPI;
+import at.iljabusch.challengeAPI.challenges.events.ChallengeCreatedEvent;
 import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerJoinEvent;
 import at.iljabusch.challengeAPI.challenges.events.ChallengePlayerLeaveEvent;
 import at.iljabusch.challengeAPI.challenges.events.ChallengeStartedEvent;
@@ -59,6 +60,8 @@ public class Challenge {
 
     this.creatorUUID = creator.getUniqueId();
     this.playerUUIDs.add(this.creatorUUID);
+
+    pluginManager.callEvent(new ChallengeCreatedEvent(this));
 
     var success = true;
     for (Environment env : List.of(Environment.NORMAL, Environment.NETHER, Environment.THE_END)) {

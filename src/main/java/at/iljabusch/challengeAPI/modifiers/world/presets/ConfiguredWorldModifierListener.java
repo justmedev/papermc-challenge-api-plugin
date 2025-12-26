@@ -27,7 +27,7 @@ public class ConfiguredWorldModifierListener implements Listener {
     }
 
     if (config.worldType == WorldType.FLAT || config.chunkGenerator != null) {
-      configuredWorldCreator.generatorSettings(config.generatorSettingsString);
+      configuredWorldCreator.generatorSettings(config.generatorSettings.getJson());
     }
     configuredWorldCreator.seed(config.seed);
     configuredWorldCreator.bonusChest(config.spawnBonusChest);

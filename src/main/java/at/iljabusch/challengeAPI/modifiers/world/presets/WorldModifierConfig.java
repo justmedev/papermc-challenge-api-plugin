@@ -4,6 +4,7 @@ import at.iljabusch.challengeAPI.ChallengeAPI;
 import lombok.Builder;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
+import org.bukkit.block.BlockType;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
@@ -40,7 +41,7 @@ public class WorldModifierConfig {
   @Builder.Default
   protected int clearWeatherDurationTicks = 0;
   protected Vector spawnLocation;
-  protected String generatorSettingsString;
+  protected FlatGeneratorSettings generatorSettings;
   @Builder.Default
   WorldType worldType = WorldType.NORMAL;
 
@@ -69,7 +70,7 @@ public class WorldModifierConfig {
            SUPERFLAT_REDSTONE_READY, SUPERFLAT_THE_VOID -> {
         return WorldModifierConfig.builder()
                                   .worldType(WorldType.FLAT)
-                                  .generatorSettingsString(getDefaultGeneratorSettings(preset));
+                                  .generatorSettings(getDefaultGeneratorSettings(preset).build());
       }
       case LARGE_BIOMES -> {
         return WorldModifierConfig.builder()
@@ -110,199 +111,105 @@ public class WorldModifierConfig {
    * @return JSON string with default generator settings
    */
   //[ChatGPT]\\
-  public static @NonNull String getDefaultGeneratorSettings(@NonNull WorldModifierPresets preset) {
+  public static FlatGeneratorSettings.FlatGeneratorSettingsBuilder getDefaultGeneratorSettings(@NonNull WorldModifierPresets preset) {
     return switch (preset) {
-      case SUPERFLAT_DEFAULT -> """
-          {
-            "biome": "minecraft:plains",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:dirt",
-                "height": 3
-              },
-              {
-                "block": "minecraft:grass_block",
-                "height": 1
-              }
-            ],
-            "structures": {
-              "village": true
-            },
-            "features": true
-          }
-          """;
+      case SUPERFLAT_DEFAULT -> FlatGeneratorSettings.builder()
+                                                     .biome(Biome.PLAINS)
+                                                     .features(false)
+                                                     .lakes(false)
+                                                     .addBlockLayer(BlockType.BEDROCK, 1)
+                                                     .addBlockLayer(BlockType.DIRT, 2)
+                                                     .addBlockLayer(BlockType.GRASS_BLOCK, 1)
+                                                     .addStructure("minecraft:villages");
 
-      case SUPERFLAT_TUNNELERS_DREAM -> """
-          {
-            "biome": "minecraft:mountain_edge",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:stone",
-                "height": 5
-              },
-              {
-                "block": "minecraft:dirt",
-                "height": 3
-              },
-              {
-                "block": "minecraft:grass_block",
-                "height": 1
-              }
-            ],
-            "structures": {
-              "village": true,
-              "mineshaft": {
-                "chance": 1.0
-              }
-            },
-            "features": true
-          }
-          """;
+      case SUPERFLAT_TUNNELERS_DREAM -> FlatGeneratorSettings.builder()
+                                                             .biome(Biome.WINDSWEPT_HILLS)
+                                                             .features(true)
+                                                             .lakes(false)
+                                                             .addBlockLayer(BlockType.BEDROCK, 1)
+                                                             .addBlockLayer(BlockType.STONE, 230)
+                                                             .addBlockLayer(BlockType.DIRT, 5)
+                                                             .addBlockLayer(BlockType.GRASS_BLOCK, 1)
+                                                             .addStructure("minecraft:mineshafts")
+                                                             .addStructure("minecraft:strongholds");
 
-      case SUPERFLAT_WATER_WORLD -> """
-          {
-            "biome": "minecraft:plains",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:water",
-                "height": 90
-              }
-            ],
-            "structures": {},
-            "features": false
-          }
-          """;
+      case SUPERFLAT_WATER_WORLD -> FlatGeneratorSettings.builder()
+                                                         .biome(Biome.DEEP_OCEAN)
+                                                         .features(false)
+                                                         .lakes(false)
+                                                         .addBlockLayer(BlockType.BEDROCK, 1)
+                                                         .addBlockLayer(BlockType.DEEPSLATE, 64)
+                                                         .addBlockLayer(BlockType.STONE, 5)
+                                                         .addBlockLayer(BlockType.DIRT, 5)
+                                                         .addBlockLayer(BlockType.GRAVEL, 5)
+                                                         .addBlockLayer(BlockType.WATER, 90)
+                                                         .addStructure("minecraft:ocean_ruins")
+                                                         .addStructure("minecraft:shipwrecks")
+                                                         .addStructure("minecraft:ocean_monuments");
 
-      case SUPERFLAT_OVERWORLD -> """
-          {
-            "biome": "minecraft:plains",
-            "layers": [
-              {
-                "block": "minecraft:air",
-                "height": 1
-              },
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              }
-            ],
-            "structures": {
-              "village": true,
-              "stronghold": true,
-              "mineshaft": true,
-              "dungeon": true
-            },
-            "features": true
-          }
-          """;
+      case SUPERFLAT_OVERWORLD -> FlatGeneratorSettings.builder()
+                                                       .biome(Biome.PLAINS)
+                                                       .features(true)
+                                                       .lakes(true)
+                                                       .addBlockLayer(BlockType.BEDROCK, 1)
+                                                       .addBlockLayer(BlockType.STONE, 59)
+                                                       .addBlockLayer(BlockType.DIRT, 3)
+                                                       .addBlockLayer(BlockType.GRASS_BLOCK, 1)
+                                                       .addStructure("minecraft:villages")
+                                                       .addStructure("minecraft:mineshafts")
+                                                       .addStructure("minecraft:pillager_outposts")
+                                                       .addStructure("minecraft:ruined_portals")
+                                                       .addStructure("minecraft:strongholds");
 
-      case SUPERFLAT_SNOWY_KINGDOM -> """
-          {
-            "biome": "minecraft:snowy_plains",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:snow_block",
-                "height": 3
-              },
-              {
-                "block": "minecraft:snow",
-                "height": 1
-              }
-            ],
-            "structures": {
-              "village": true
-            },
-            "features": true
-          }
-          """;
+      case SUPERFLAT_SNOWY_KINGDOM -> FlatGeneratorSettings.builder()
+                                                           .biome(Biome.SNOWY_PLAINS)
+                                                           .features(false)
+                                                           .lakes(false)
+                                                           .addBlockLayer(BlockType.BEDROCK, 1)
+                                                           .addBlockLayer(BlockType.STONE, 59)
+                                                           .addBlockLayer(BlockType.DIRT, 3)
+                                                           .addBlockLayer(BlockType.GRASS_BLOCK, 1)
+                                                           .addBlockLayer(BlockType.SNOW, 1)
+                                                           .addStructure("minecraft:villages")
+                                                           .addStructure("minecraft:igloos");
 
-      case SUPERFLAT_BOTTOMLESS_PIT -> """
-          {
-            "biome": "minecraft:plains",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:air",
-                "height": 64
-              }
-            ],
-            "structures": {},
-            "features": false
-          }
-          """;
+      case SUPERFLAT_BOTTOMLESS_PIT -> FlatGeneratorSettings.builder()
+                                                            .biome(Biome.PLAINS)
+                                                            .features(false)
+                                                            .lakes(false)
+                                                            .addBlockLayer(BlockType.COBBLESTONE, 2)
+                                                            .addBlockLayer(BlockType.DIRT, 3)
+                                                            .addBlockLayer(BlockType.GRASS_BLOCK, 1)
+                                                            .addStructure("minecraft:villages");
 
-      case SUPERFLAT_DESERT -> """
-          {
-            "biome": "minecraft:desert",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:sand",
-                "height": 3
-              },
-              {
-                "block": "minecraft:sandstone",
-                "height": 1
-              }
-            ],
-            "structures": {
-              "village": true,
-              "desert_pyramid": true
-            },
-            "features": true
-          }
-          """;
+      case SUPERFLAT_DESERT -> FlatGeneratorSettings.builder()
+                                                    .biome(Biome.DESERT)
+                                                    .features(true)
+                                                    .lakes(false)
+                                                    .addBlockLayer(BlockType.BEDROCK, 1)
+                                                    .addBlockLayer(BlockType.STONE, 3)
+                                                    .addBlockLayer(BlockType.SANDSTONE, 52)
+                                                    .addBlockLayer(BlockType.SAND, 8)
+                                                    .addStructure("minecraft:villages")
+                                                    .addStructure("minecraft:desert_pyramids")
+                                                    .addStructure("minecraft:mineshafts")
+                                                    .addStructure("minecraft:strongholds");
 
-      case SUPERFLAT_REDSTONE_READY -> """
-          {
-            "biome": "minecraft:bedrock",
-            "layers": [
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              },
-              {
-                "block": "minecraft:bedrock",
-                "height": 1
-              }
-            ],
-            "structures": {},
-            "features": false
-          }
-          """;
+      case SUPERFLAT_REDSTONE_READY -> FlatGeneratorSettings.builder()
+                                                            .biome(Biome.DESERT)
+                                                            .features(false)
+                                                            .lakes(false)
+                                                            .addBlockLayer(BlockType.BEDROCK, 1)
+                                                            .addBlockLayer(BlockType.STONE, 3)
+                                                            .addBlockLayer(BlockType.SANDSTONE, 116);
 
-      case SUPERFLAT_THE_VOID -> """
-          {
-            "biome": "minecraft:the_void",
-            "layers": [],
-            "structures": {},
-            "features": false
-          }
-          """;
+      case SUPERFLAT_THE_VOID -> FlatGeneratorSettings.builder()
+                                                      .biome(Biome.THE_VOID)
+                                                      .features(true)
+                                                      .lakes(false)
+                                                      .addBlockLayer(BlockType.AIR, 1);
 
-      default -> "{}";
+      default -> FlatGeneratorSettings.builder();
     };
   }
 
